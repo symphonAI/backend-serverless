@@ -6,7 +6,7 @@ import (
 )
 
 func handlePrompt() (string, error) {
-	return "Hello λ!", nil
+	return "Spotify playlist URL goes here", nil
 }
 
 func main() {

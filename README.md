@@ -15,15 +15,15 @@ The `cdk.json` file tells the CDK toolkit how to execute your app.
 4. Install VS Code (https://code.visualstudio.com/)
 5. Install the Go plugin and associated tools for VS Code (https://medium.com/backend-habit/setting-golang-plugin-on-vscode-for-autocomplete-and-auto-import-30bf5c58138a). **Ignore steps 2, 3 and 4 in this guide if you're on a Mac**
 6. Install the AWS CDK toolkit: https://docs.aws.amazon.com/cdk/v2/guide/cli.html
+7. Setup a AWS profile for deployment from your machine if you haven't already: https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html
 
 ## Deployment
 
-1. Run `cdk diff` to check the changes between what exists in AWS and what changes will be made as a result of your infrastructure/code changes.
-2. Run `cdk deploy` to run the infrastructure/code changes against AWS.
+Run `cdk deploy` to run the infrastructure/code changes against AWS.
 
 **TODO: Automate deployment via Github actions**
 
-## Useful commands
+## Other Useful CDK Commands
 
 - `cdk deploy` deploy this stack to your default AWS account/region
 - `cdk diff` compare deployed stack with current state

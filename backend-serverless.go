@@ -32,7 +32,8 @@ func NewBackendServerlessStack(scope constructs.Construct, id string, props *Bac
 	// Create a new lambda function.
 	promptFunc := awslambdago.NewGoFunction(stack, jsii.String("prompt-handler"), &awslambdago.GoFunctionProps{
 		MemorySize: jsii.Number(128),
-		Entry:      jsii.String("../lambdas/prompt-handler"),
+		ModuleDir: jsii.String("./go.mod"),
+		Entry:      jsii.String("./lambdas/prompt-handler"),
 	})
 
 	// Add a lambda proxy integration.

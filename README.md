@@ -1,4 +1,4 @@
-# SymphonAI Backend
+# SymphonAI Serverless Backend
 
 The backend infrastructure-as-code (IAC) and lambda code for the SymphonAI APIs.
 

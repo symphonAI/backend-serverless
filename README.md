@@ -8,7 +8,7 @@ The `cdk.json` file tells the CDK toolkit how to execute your app.
 
 1. Clone this git repo to your machine
 2. Install Golang (https://go.dev/doc/install)
-3. In your command-line interface (CLI), run the following:
+3. In your command-line interface (CLI), run the following in the root directory of this repository:
    ```
        go get
    ```

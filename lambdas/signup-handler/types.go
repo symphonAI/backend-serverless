@@ -5,3 +5,7 @@ type TokenResponse struct {
 	AccessToken  string `json:"access_token"`
 }
 
+type SpotifyResponse struct {
+	ID    string `json:"id"`
+	Email string `json:"email"`
+}

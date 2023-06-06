@@ -50,7 +50,7 @@ func exchangeCodeForAuthTokens(code string) (string, string, error) {
 	if err != nil {
 		// TODO error handling 
 	}
-	
+
 	var tokenResponse TokenResponse
 	err = json.Unmarshal(responseData, &tokenResponse)
 	if err != nil {
@@ -58,4 +58,35 @@ func exchangeCodeForAuthTokens(code string) (string, string, error) {
 	}
 
 	return tokenResponse.AccessToken, tokenResponse.RefreshToken, nil
+}
+
+func getUserIdentifiers(accessToken string) (string, string, error){
+	url := "https://api.spotify.com/v1/me"
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return "", "", err
+	}
+
+	req.Header.Set("Authorization", "Bearer "+accessToken)
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return "", "", err
+	}
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return "", "", err
+	}
+
+	var data SpotifyResponse
+	err = json.Unmarshal(body, &data)
+	if err != nil {
+		return "", "", err
+	}
+
+	return data.ID, data.Email, nil
+
 }

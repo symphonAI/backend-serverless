@@ -12,7 +12,7 @@ import (
 
 func handlePrompt(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error)  {
 	code := request.QueryStringParameters["code"]
-	fmt.Println("Code:", code)
+	fmt.Println("Received auth code:", code)
 
 	refresh_token, access_token, err := exchangeCodeForAuthTokens(code)
 	if err != nil {
@@ -23,7 +23,13 @@ func handlePrompt(ctx context.Context, request events.APIGatewayProxyRequest) (e
 		return response, nil // TODO should return error instead?
 	}
 
+	// Get User Email
+	id, email, err := getUserIdentifiers(access_token)
+
 	// Save user in Cognito User Pool, retain User ID
+	err = SaveUserToCognito(id, email)
+
+	// TODO if err != nil etc.....
 
 
 	// Save User ID, Refresh token against this user

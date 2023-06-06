@@ -1,29 +1,31 @@
 package main
 
 import (
+	"context"
 	"fmt"
+	"log"
+	"os"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider"
+	"github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider/types"
 )
 
-func SaveUserToCognito(username, password, email string) error {
-	// Create a new session using your AWS credentials.
-	sess, err := session.NewSession(&aws.Config{
-		Region: aws.String("ap-southeast-2"), 
-	})
-	if err != nil {
-		return err
-	}
+func SaveUserToCognito(id string, email string) error {
+	cfg, err := config.LoadDefaultConfig(context.TODO(), config.WithRegion("ap-southeast-2"))
+    if err != nil {
+        log.Fatalf("unable to load SDK config, %v", err)
+    }
 
 	// Create a new CognitoIdentityProvider client.
-	cognitoClient := cognitoidentityprovider.New(sess)
+	cognitoClient := cognitoidentityprovider.NewFromConfig(cfg)
 
 	// Specify the user pool ID and client ID.
-	userPoolID := "your_user_pool_id"
-	clientID := "your_client_id"
+	userPoolID := os.Getenv("COGNITO_USER_POOL_ID")
 
 	// Set up the user attributes.
-	userAttributes := []*cognitoidentityprovider.AttributeType{
+	userAttributes := []types.AttributeType{
 		{
 			Name:  aws.String("email"),
 			Value: aws.String(email),
@@ -33,17 +35,13 @@ func SaveUserToCognito(username, password, email string) error {
 	// Create the user input.
 	userInput := &cognitoidentityprovider.AdminCreateUserInput{
 		UserPoolId:          aws.String(userPoolID),
-		Username:            aws.String(username),
-		TemporaryPassword:   aws.String(password),
 		UserAttributes:      userAttributes,
-		DesiredDeliveryMediums: []*string{
-			aws.String("EMAIL"),
-		},
-		ForceAliasCreation: aws.Bool(true),
+		DesiredDeliveryMediums: types.DeliveryMediumTypeEmail.Values(),
+		ForceAliasCreation: false,
 	}
 
 	// Create the user in the user pool.
-	_, err = cognitoClient.AdminCreateUser(userInput)
+	_, err = cognitoClient.AdminCreateUser(context.TODO(), userInput)
 	if err != nil {
 		return err
 	}

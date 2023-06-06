@@ -54,7 +54,7 @@ func NewBackendServerlessStack(scope constructs.Construct, id string, props *Bac
 		}})
 
 	awscognito.NewCfnUserPoolClient(stack, jsii.String("SymphonAIUserPoolClient"), &awscognito.CfnUserPoolClientProps{
-		UserPoolId: userPool.Node().Id(),
+		UserPoolId: userPool.AttrArn(),
 	})
 	
 	// Create a new api HTTP api on gateway v2.

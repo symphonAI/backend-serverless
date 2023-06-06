@@ -35,7 +35,7 @@ func NewBackendServerlessStack(scope constructs.Construct, id string, props *Bac
 
 
 	// Create a AWS Cognito user pool
-	userPool := awscognito.NewCfnUserPool(stack, jsii.String("SymphonAIUserPool"), &awscognito.CfnUserPoolProps{
+	userPool := awscognito.NewCfnUserPool(stack, jsii.String("symphonai-user-pool"), &awscognito.CfnUserPoolProps{
 		UserPoolName: jsii.String("symphonai-user-pool"),
 		AutoVerifiedAttributes: &ptrSlice,
 		Schema: []interface{}{

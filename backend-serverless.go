@@ -64,23 +64,38 @@ func NewBackendServerlessStack(scope constructs.Construct, id string, props *Bac
 		},
 	})
 
-	// Create a new lambda function.
+	// Prompt lambda function.
 	promptFunc := awslambdago.NewGoFunction(stack, jsii.String("prompt-handler"), &awslambdago.GoFunctionProps{
 		MemorySize: jsii.Number(128),
 		ModuleDir: jsii.String("./go.mod"),
 		Entry:      jsii.String("./lambdas/prompt-handler"),
 	})
 
-	// Add a lambda proxy integration.
 	promptIntegration := awsapigatewayv2integrations.NewHttpLambdaIntegration(
 		jsii.String("PromptIntegration"), 
 		promptFunc, 
 		&awsapigatewayv2integrations.HttpLambdaIntegrationProps{})
 
-	// Add a route to api.
 	api.AddRoutes(&awsapigatewayv2.AddRoutesOptions{
 		Integration: promptIntegration,
 		Path:        jsii.String("/prompt"),
+	})
+
+	// Signup lambda function
+	signupFunc := awslambdago.NewGoFunction(stack, jsii.String("prompt-handler"), &awslambdago.GoFunctionProps{
+		MemorySize: jsii.Number(128),
+		ModuleDir: jsii.String("./go.mod"),
+		Entry:      jsii.String("./lambdas/signup-handler"),
+	})
+
+	signupIntegration := awsapigatewayv2integrations.NewHttpLambdaIntegration(
+		jsii.String("SignupIntegration"), 
+		signupFunc, 
+		&awsapigatewayv2integrations.HttpLambdaIntegrationProps{})
+
+	api.AddRoutes(&awsapigatewayv2.AddRoutesOptions{
+		Integration: signupIntegration,
+		Path:        jsii.String("/signup"),
 	})
 
 	return stack

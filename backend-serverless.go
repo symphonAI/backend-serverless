@@ -4,6 +4,7 @@ import (
 	"github.com/aws/aws-cdk-go/awscdk"
 	"github.com/aws/aws-cdk-go/awscdk/awsapigatewayv2"
 	"github.com/aws/aws-cdk-go/awscdk/awsapigatewayv2integrations"
+	"github.com/aws/aws-cdk-go/awscdk/awscognito"
 	"github.com/aws/aws-cdk-go/awscdk/awslambdago"
 	"github.com/aws/constructs-go/constructs/v3"
 	"github.com/aws/jsii-runtime-go"
@@ -21,6 +22,41 @@ func NewBackendServerlessStack(scope constructs.Construct, id string, props *Bac
 	}
 	stack := awscdk.NewStack(scope, &id, &sprops)
 
+
+	strSlice := []string{
+		"email",
+	}
+
+	// Convert []string to []*string
+	var ptrSlice []*string
+	for _, str := range strSlice {
+		ptrSlice = append(ptrSlice, &str)
+	}
+
+
+	// Create a AWS Cognito user pool
+	userPool := awscognito.NewCfnUserPool(stack, jsii.String("SymphonAIUserPool"), &awscognito.CfnUserPoolProps{
+		UserPoolName: jsii.String("symphonai-user-pool"),
+		AutoVerifiedAttributes: &ptrSlice,
+		Schema: []interface{}{
+			map[string]interface{}{
+				"attributeDataType": "String",
+				"name":              "email",
+				"mutable":           true,
+				"required":          true,
+			},
+			map[string]interface{}{
+				"attributeDataType": "String",
+				"name":              "name",
+				"mutable":           true,
+				"required":          false,
+			},
+		}})
+
+	awscognito.NewCfnUserPoolClient(stack, jsii.String("SymphonAIUserPoolClient"), &awscognito.CfnUserPoolClientProps{
+		UserPoolId: userPool.Node().Id(),
+	})
+	
 	// Create a new api HTTP api on gateway v2.
 	api := awsapigatewayv2.NewHttpApi(stack, jsii.String("symphonai-api"), &awsapigatewayv2.HttpApiProps{
 		CorsPreflight: &awsapigatewayv2.CorsPreflightOptions{

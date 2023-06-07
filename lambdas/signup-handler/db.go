@@ -9,15 +9,13 @@ import (
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
-	"github.com/google/uuid"
 )
 
-func saveUserAndRefreshTokenToDb(email string, refreshToken string) error {
+func saveUserAndRefreshTokenToDb(userId string, email string, refreshToken string) error {
 	cfg, err := config.LoadDefaultConfig(context.TODO(), config.WithRegion("ap-southeast-2"))
     if err != nil {
         log.Fatalf("unable to load SDK config, %v", err)
     }
-	userId := uuid.New().String()
 
 	ddb := dynamodb.NewFromConfig(cfg)
 

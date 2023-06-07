@@ -32,14 +32,22 @@ func handlePrompt(ctx context.Context, request events.APIGatewayProxyRequest) (e
 	// TODO if err != nil etc.....
 	
 	// Save User ID, Refresh token against this user in DB
-
+	saveUserAndRefreshTokenToDb(id, email, refresh_token)
 
 	// TODO if err != nil etc.....
 
-	// Create JWT and return in response
+	jwToken, err := GenerateJWT("ap-southeast-2", email)
+	if err != nil {
+		response := events.APIGatewayProxyResponse{
+			StatusCode: http.StatusInternalServerError, 
+			Body: "Error creating JWT Token",
+		}
+		return response, nil
+	}
+
 	response := events.APIGatewayProxyResponse{
 		StatusCode: http.StatusOK, 
-		Body: jsonRespAsStr,
+		Body: jwToken,
 	}
 
 

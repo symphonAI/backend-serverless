@@ -47,7 +47,7 @@ func NewBackendServerlessStack(scope constructs.Construct, id string, props *Bac
 	// and SortKey (literally just "PartitionKey" and "SortKey")
 	// For more info, please see:
 	// https://www.alexdebrie.com/posts/dynamodb-single-table/
-	ddbTable := awsdynamodb.NewTable(stack, jsii.String("prompt-handler"), &awsdynamodb.TableProps{
+	ddbTable := awsdynamodb.NewTable(stack, jsii.String("symphonai-dbtbl"), &awsdynamodb.TableProps{
 		PartitionKey: &awsdynamodb.Attribute{
 			Name: jsii.String("PartitionKey"),
 			Type: awsdynamodb.AttributeType_STRING,
@@ -163,7 +163,7 @@ func NewBackendServerlessStack(scope constructs.Construct, id string, props *Bac
 		Roles:          &signupRoleInPolicy,
 	})
 
-	signupFunc := awslambdago.NewGoFunction(stack, jsii.String("prompt-handler"), &awslambdago.GoFunctionProps{
+	signupFunc := awslambdago.NewGoFunction(stack, jsii.String("signup-handler"), &awslambdago.GoFunctionProps{
 		MemorySize: jsii.Number(128),
 		ModuleDir: jsii.String("./go.mod"),
 		Entry:      jsii.String("./lambdas/signup-handler"),

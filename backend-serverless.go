@@ -195,8 +195,10 @@ func addSecretCredentialsToEnvVars(envVars map[string]*string) error {
 
 	parameterName := "/symphonai/credentials/prod"
 
+	decrypt := true
 	input := &ssm.GetParameterInput{
 		Name: &parameterName,
+		WithDecryption: &decrypt,
 	}
 
 	result, err := ssmClient.GetParameter(context.TODO(), input)
@@ -204,8 +206,6 @@ func addSecretCredentialsToEnvVars(envVars map[string]*string) error {
 		fmt.Println(err.Error())
 		return err
 	}
-
-	fmt.Println(*result.Parameter.Value)
 
 	if err != nil {
 		return err

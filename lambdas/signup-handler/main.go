@@ -50,7 +50,6 @@ func handlePrompt(ctx context.Context, request events.APIGatewayProxyRequest) (e
 		Body: jwToken,
 	}
 
-
 	return response, nil
 }
 

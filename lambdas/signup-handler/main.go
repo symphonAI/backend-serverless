@@ -30,9 +30,9 @@ func handlePrompt(ctx context.Context, request events.APIGatewayProxyRequest) (e
 	err = SaveUserToCognito(id, email)
 
 	// TODO if err != nil etc.....
+	
+	// Save User ID, Refresh token against this user in DB
 
-
-	// Save User ID, Refresh token against this user
 
 	// TODO if err != nil etc.....
 

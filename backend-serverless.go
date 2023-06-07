@@ -5,6 +5,7 @@ import (
 	"github.com/aws/aws-cdk-go/awscdk/awsapigatewayv2"
 	"github.com/aws/aws-cdk-go/awscdk/awsapigatewayv2integrations"
 	"github.com/aws/aws-cdk-go/awscdk/awscognito"
+	"github.com/aws/aws-cdk-go/awscdk/awsdynamodb"
 	"github.com/aws/aws-cdk-go/awscdk/awslambdago"
 	"github.com/aws/constructs-go/constructs/v3"
 	"github.com/aws/jsii-runtime-go"
@@ -97,6 +98,19 @@ func NewBackendServerlessStack(scope constructs.Construct, id string, props *Bac
 		Integration: signupIntegration,
 		Path:        jsii.String("/signup"),
 	})
+
+	// DynamoDB table
+	awsdynamodb.NewTable(stack, jsii.String("prompt-handler"), &awsdynamodb.TableProps{
+		PartitionKey: &awsdynamodb.Attribute{
+			Name: jsii.String("PartitionKey"),
+			Type: awsdynamodb.AttributeType_STRING,
+		},
+		SortKey: &awsdynamodb.Attribute{
+			Name: jsii.String("SortKey"),
+			Type: awsdynamodb.AttributeType_STRING,
+		},
+	})
+
 
 	return stack
 }

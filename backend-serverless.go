@@ -121,11 +121,11 @@ func NewBackendServerlessStack(scope constructs.Construct, id string, props *Bac
 	
 	// The role is gonna be a bit of a pain...
 	signupRole := awsiam.NewRole(stack, jsii.String("signup-lambda-role"), &awsiam.RoleProps{
-		AssumedBy: awsiam.NewServicePrincipal(jsii.String("sns.amazonaws.com"), &awsiam.ServicePrincipalOpts{
+		AssumedBy: awsiam.NewServicePrincipal(jsii.String("lambda.amazonaws.com"), &awsiam.ServicePrincipalOpts{
 			Region: jsii.String("ap-southeast-2"),
 		}),
 	})
-
+		
 	// Define the policy statements
 	statements := []awsiam.PolicyStatement{}
 	userPoolResourceInPolicy := aws.StringSlice([]string{*userPool.AttrArn()})

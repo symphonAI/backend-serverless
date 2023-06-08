@@ -137,16 +137,16 @@ func NewBackendServerlessStack(scope constructs.Construct, id string, props *Bac
 			Actions:   jsii.Strings("*"),
 		}),
 	)
-	userPoolClientResourceInPolicy := aws.StringSlice([]string{*userPoolClient.Ref()})
-	fmt.Println("User Pool Client Resource:", userPoolClientResourceInPolicy)
+	// userPoolClientResourceInPolicy := aws.StringSlice([]string{*userPoolClient.Ref()})
+	// fmt.Println("User Pool Client Resource:", userPoolClientResourceInPolicy)
 
-	statements = append(statements, 
-		awsiam.NewPolicyStatement(&awsiam.PolicyStatementProps{
-			Effect:    awsiam.Effect_ALLOW,
-			Resources: &userPoolClientResourceInPolicy,
-			Actions:   jsii.Strings("*"),
-		}),
-	)
+	// statements = append(statements, 
+	// 	awsiam.NewPolicyStatement(&awsiam.PolicyStatementProps{
+	// 		Effect:    awsiam.Effect_ALLOW,
+	// 		Resources: &userPoolClientResourceInPolicy,
+	// 		Actions:   jsii.Strings("*"),
+	// 	}),
+	// )
 
 	ddbTableInPolicy := aws.StringSlice([]string{*ddbTable.TableArn()})
 	fmt.Println("DynamoDB resource:", ddbTableInPolicy)

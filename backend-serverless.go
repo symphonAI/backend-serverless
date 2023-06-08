@@ -193,6 +193,7 @@ func NewBackendServerlessStack(scope constructs.Construct, id string, props *Bac
 func addSecretCredentialsToEnvVars(envVars map[string]*string) error {
 	fmt.Println("Attempting to fetch secret credentials from SSM parameter store...")
 	cfg, err := config.LoadDefaultConfig(context.TODO())
+	cfg.Region = "ap-southeast-2"
 	if err != nil {
 		panic("configuration error, " + err.Error())
 	}

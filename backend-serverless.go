@@ -129,6 +129,7 @@ func NewBackendServerlessStack(scope constructs.Construct, id string, props *Bac
 	// Define the policy statements
 	statements := []awsiam.PolicyStatement{}
 	userPoolResourceInPolicy := aws.StringSlice([]string{*userPool.AttrArn()})
+	fmt.Println("User Pool reference ARN:", userPoolResourceInPolicy)
 	statements = append(statements, 
 		awsiam.NewPolicyStatement(&awsiam.PolicyStatementProps{
 			Effect:    awsiam.Effect_ALLOW,
@@ -137,6 +138,7 @@ func NewBackendServerlessStack(scope constructs.Construct, id string, props *Bac
 		}),
 	)
 	userPoolClientResourceInPolicy := aws.StringSlice([]string{*userPoolClient.Ref()})
+	fmt.Println("User Pool Client Resource:", userPoolClientResourceInPolicy)
 
 	statements = append(statements, 
 		awsiam.NewPolicyStatement(&awsiam.PolicyStatementProps{
@@ -147,6 +149,8 @@ func NewBackendServerlessStack(scope constructs.Construct, id string, props *Bac
 	)
 
 	ddbTableInPolicy := aws.StringSlice([]string{*ddbTable.TableArn()})
+	fmt.Println("DynamoDB resource:", ddbTableInPolicy)
+
 	statements = append(statements, 
 		awsiam.NewPolicyStatement(&awsiam.PolicyStatementProps{
 			Effect:    awsiam.Effect_ALLOW,
@@ -156,6 +160,8 @@ func NewBackendServerlessStack(scope constructs.Construct, id string, props *Bac
 	)
 
 	signupRoleInPolicy := []awsiam.IRole{signupRole}
+	fmt.Println("SignupRole resource:", signupRoleInPolicy)
+
 	// Create the policy and add the statements and add the role
 	awsiam.NewPolicy(stack, jsii.String("signup-role-policy"), &awsiam.PolicyProps{
 		PolicyName:     aws.String("signup-role-policy"),

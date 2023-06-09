@@ -3,6 +3,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 
@@ -11,7 +12,20 @@ import (
 )
 
 func handlePrompt(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error)  {
-	code := request.QueryStringParameters["code"]
+	// Retrieve the request body from the event
+	requestBody := SignupRequestBody{}
+	err := json.Unmarshal([]byte(request.Body), &requestBody)
+	if err != nil {
+		response := events.APIGatewayProxyResponse{
+			StatusCode: 400,
+			Body:       "JSON key: 'code' missing from response",
+		}
+		return response, nil 
+	}
+
+
+	code := requestBody.Code
+
 	fmt.Println("Received auth code:", code)
 
 	refresh_token, access_token, err := exchangeCodeForAuthTokens(code)

@@ -36,20 +36,42 @@ func handlePrompt(ctx context.Context, request events.APIGatewayProxyRequest) (e
 		}
 		return response, nil // TODO should return error instead?
 	}
+	fmt.Println("Successfully generated refresh token and access token.")
 
 	// Get User Email
+	fmt.Println("Getting user data from spotify...")
 	id, email, err := getUserIdentifiers(access_token)
+	if err != nil {
+		response := events.APIGatewayProxyResponse{
+			StatusCode: 500,
+			Body:       "Unable to get Spotify user identifiers",
+		}
+		return response, nil 
 
+	}
+	fmt.Println("Saving user to cognito...")
 	// Save user in Cognito User Pool, retain User ID
 	err = SaveUserToCognito(id, email)
+	if err != nil {
+		response := events.APIGatewayProxyResponse{
+			StatusCode: 500,
+			Body:       "Unable to save user in Cognito user pool",
+		}
+		return response, nil 
+	}
 
 	// TODO if err != nil etc.....
 	
 	// Save User ID, Refresh token against this user in DB
 	saveUserAndRefreshTokenToDb(id, email, refresh_token)
 
-	// TODO if err != nil etc.....
-
+	if err != nil {
+		response := events.APIGatewayProxyResponse{
+			StatusCode: 500,
+			Body:       "Unable to save user to DB",
+		}
+		return response, nil 
+	}
 	jwToken, err := GenerateJWT("ap-southeast-2", email)
 	if err != nil {
 		response := events.APIGatewayProxyResponse{

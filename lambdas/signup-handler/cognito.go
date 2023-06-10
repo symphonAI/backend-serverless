@@ -39,7 +39,7 @@ func saveUserToCognito(id string, email string) error {
 		UserPoolId:          aws.String(userPoolID),
 		UserAttributes:      userAttributes,
 		Username: &email, // TODO Should we use ID instead?
-		DesiredDeliveryMediums: types.DeliveryMediumTypeEmail.Values(),
+		DesiredDeliveryMediums: []types.DeliveryMediumType{types.DeliveryMediumTypeEmail},
 		ForceAliasCreation: false,
 	}
 

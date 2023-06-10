@@ -100,7 +100,6 @@ func NewBackendServerlessStack(scope constructs.Construct, id string, props *Bac
 
 	addSecretCredentialsToEnvVars(promptLambdaEnvVars)
 
-	
 	durationInMinutes := 10.00
 
 	promptFunc := awslambdago.NewGoFunction(stack, jsii.String("prompt-handler"), &awslambdago.GoFunctionProps{

@@ -60,7 +60,7 @@ func exchangeCodeForAuthTokens(code string) (string, string, error) {
 	}
 
 	fmt.Println("[TEMP] TokenResponse.AccessToken", tokenResponse.AccessToken)
-	return tokenResponse.AccessToken, tokenResponse.RefreshToken, nil
+	return tokenResponse.RefreshToken, tokenResponse.AccessToken, nil
 }
 
 func getUserIdentifiers(accessToken string) (string, string, error){

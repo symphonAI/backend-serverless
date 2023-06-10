@@ -86,9 +86,7 @@ func NewBackendServerlessStack(scope constructs.Construct, id string, props *Bac
 		CorsPreflight: &awsapigatewayv2.CorsPreflightOptions{
 			AllowOrigins: &[]*string{jsii.String("https://symphon.ai"), jsii.String("http://localhost:3000")}, // Provide a list of allowed origins
 			AllowMethods: &[]awsapigatewayv2.CorsHttpMethod{
-				awsapigatewayv2.CorsHttpMethod_POST,
-				awsapigatewayv2.CorsHttpMethod_GET,
-				awsapigatewayv2.CorsHttpMethod_OPTIONS,
+				awsapigatewayv2.CorsHttpMethod_ANY,
 			},
 		},
 	})

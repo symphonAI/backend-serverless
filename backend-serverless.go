@@ -120,7 +120,7 @@ func NewBackendServerlessStack(scope constructs.Construct, id string, props *Bac
     signupLambdaEnvVars := make(map[string]*string)
 
     // Assign the values to the map
-    signupLambdaEnvVars["COGNITO_USER_POOL_ID"] = userPool.Node().Id()
+    signupLambdaEnvVars["COGNITO_USER_POOL_ID"] = userPool.Ref()
     signupLambdaEnvVars["COGNITO_USER_POOL_CLIENT_ID"] = userPoolClient.Node().Id()
 	signupLambdaEnvVars["DYNAMODB_TABLE_NAME"] = ddbTable.TableName()
 

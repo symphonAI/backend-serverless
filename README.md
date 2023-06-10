@@ -17,6 +17,27 @@ The `cdk.json` file tells the CDK toolkit how to execute your app.
 6. Install the AWS CDK toolkit: https://docs.aws.amazon.com/cdk/v2/guide/cli.html
 7. Setup a AWS profile for deployment from your machine if you haven't already: https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html
 
+## Running Locally
+
+You can try running the API locally using the SAM CLI, but no guarantees all the code (like Cognito access etc.) will run properly.
+
+### Setup Steps for Running Locally
+
+1. Carry out all the steps in the _Developer Setup_ section above.
+2. Install Docker (https://www.docker.com/)
+3. Install the SAM CLI (https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html)
+
+### Steps to Run Locally
+
+1. Make sure Docker is running.
+2. In the CLI, navigate to this directory and run: `make start`. This will expose the API on http://localhost:8080, so you will be able to hit API endpoints like http://localhost:8080/prompt.
+
+**Note:** If the `make` command doesn't work on your machine, then you will need to install Make. The exact instructions vary depending on your OS, so you might have to Google....here are instructions for Ubuntu: https://linuxhint.com/install-make-ubuntu/
+
+If you are unable to install make, then run the individual commands under `make start` that are listed in the `Makefile` contained within the root directory.
+
+4. Press Ctrl+C to stop running the API on your machine.
+
 ## Deployment
 
 Run `cdk deploy` to run the infrastructure/code changes against AWS.

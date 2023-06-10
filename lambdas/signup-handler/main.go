@@ -59,6 +59,8 @@ func handlePrompt(ctx context.Context, request events.APIGatewayProxyRequest) (e
 		}
 		return response, nil 
 	}
+
+	fmt.Println("Saving user and refresh token to DB...")
 	
 	// Save User ID, Refresh token against this user in DB
 	saveUserAndRefreshTokenToDb(id, email, refresh_token)
@@ -70,6 +72,9 @@ func handlePrompt(ctx context.Context, request events.APIGatewayProxyRequest) (e
 		}
 		return response, nil 
 	}
+	fmt.Println("Successfully saved user and refresh token in DB.")
+
+	fmt.Println("Generating JWT...")
 	jwToken, err := GenerateJWT("ap-southeast-2", email)
 	if err != nil {
 		response := events.APIGatewayProxyResponse{
@@ -79,6 +84,7 @@ func handlePrompt(ctx context.Context, request events.APIGatewayProxyRequest) (e
 		return response, nil
 	}
 
+	fmt.Println("Successfully generated JWT. Returning JWT in response...")
 	response := events.APIGatewayProxyResponse{
 		StatusCode: http.StatusOK, 
 		Body: jwToken,

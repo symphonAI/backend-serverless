@@ -36,6 +36,7 @@ func saveUserToCognito(id string, email string) error {
 	userInput := &cognitoidentityprovider.AdminCreateUserInput{
 		UserPoolId:          aws.String(userPoolID),
 		UserAttributes:      userAttributes,
+		Username: &id,
 		DesiredDeliveryMediums: types.DeliveryMediumTypeEmail.Values(),
 		ForceAliasCreation: false,
 	}
@@ -47,6 +48,6 @@ func saveUserToCognito(id string, email string) error {
 		return err
 	}
 
-	fmt.Println("User created successfully.")
+	fmt.Println("User created successfully in Cognito.")
 	return nil
 }

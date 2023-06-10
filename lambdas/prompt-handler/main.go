@@ -2,6 +2,9 @@
 package main
 
 import (
+	"context"
+	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 
@@ -15,17 +18,31 @@ type config struct {
 	chatgptClient chatgptapi.Client
 }
 
-func handlePrompt(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+func handlePrompt(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	fmt.Println("Prompt called")
 	cfg := config{
 		chatgptClient: chatgptapi.NewClient(),
 	}
-	fmt.Println(request)
+
+	requestBody := PromptRequestBody{}
+	err := json.Unmarshal([]byte(request.Body), &requestBody)
+	if err != nil {
+		errorString := fmt.Sprintf("unable to unmarshal request body: %s", err.Error())
+		response := events.APIGatewayProxyResponse{
+			StatusCode: 400,
+			Body:       errorString,
+		}
+		return response, errors.New(errorString)
+	}
+
+	fmt.Println("Received prompt:", requestBody.Prompt)
+	fmt.Println("Received temperature:", requestBody.Temperature)
+
 
 	// call chatGPT api
 	userFields := chatgptapi.UserFields{
-		Prompt:      "Hello. This is Squid.",
-		Temperature: "0.9",
+		Prompt:      requestBody.Prompt,
+		Temperature: requestBody.Temperature,
 	}
 	
 

@@ -84,7 +84,11 @@ func NewBackendServerlessStack(scope constructs.Construct, id string, props *Bac
 	// Create a new api HTTP api on gateway v2.
 	api := awsapigatewayv2.NewHttpApi(stack, jsii.String("symphonai-api"), &awsapigatewayv2.HttpApiProps{
 		CorsPreflight: &awsapigatewayv2.CorsPreflightOptions{
-			AllowOrigins: &[]*string{jsii.String("https://symphon.ai"), jsii.String("http://localhost:3000")}, // Provide a list of allowed origins	
+			AllowOrigins: &[]*string{jsii.String("https://symphon.ai"), jsii.String("http://localhost:3000")}, // Provide a list of allowed origins
+			AllowMethods: &[]awsapigatewayv2.CorsHttpMethod{
+				awsapigatewayv2.CorsHttpMethod_POST,
+				awsapigatewayv2.CorsHttpMethod_GET,
+			},
 		},
 	})
 

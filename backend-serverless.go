@@ -88,6 +88,7 @@ func NewBackendServerlessStack(scope constructs.Construct, id string, props *Bac
 			AllowMethods: &[]awsapigatewayv2.CorsHttpMethod{
 				awsapigatewayv2.CorsHttpMethod_POST,
 				awsapigatewayv2.CorsHttpMethod_GET,
+				awsapigatewayv2.CorsHttpMethod_OPTIONS,
 			},
 		},
 	})

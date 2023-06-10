@@ -17,3 +17,7 @@
 # CDK asset staging directory
 .cdk.staging
 cdk.out
+
+# Remove vendor directory (use go mod tidy && go mod vendor for local development)
+# Reasoning: AWS CDK is 5K files... gross
+vendor/

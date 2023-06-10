@@ -12,7 +12,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider/types"
 )
 
-func SaveUserToCognito(id string, email string) error {
+func saveUserToCognito(id string, email string) error {
 	cfg, err := config.LoadDefaultConfig(context.TODO(), config.WithRegion("ap-southeast-2"))
     if err != nil {
         log.Fatalf("unable to load SDK config, %v", err)
@@ -43,6 +43,7 @@ func SaveUserToCognito(id string, email string) error {
 	// Create the user in the user pool.
 	_, err = cognitoClient.AdminCreateUser(context.TODO(), userInput)
 	if err != nil {
+		fmt.Println("Error saving user in Cognito user pool:", err)
 		return err
 	}
 

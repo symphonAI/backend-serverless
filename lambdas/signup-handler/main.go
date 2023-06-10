@@ -51,7 +51,7 @@ func handlePrompt(ctx context.Context, request events.APIGatewayProxyRequest) (e
 	}
 	fmt.Println("Saving user to cognito...")
 	// Save user in Cognito User Pool, retain User ID
-	err = SaveUserToCognito(id, email)
+	err = saveUserToCognito(id, email)
 	if err != nil {
 		response := events.APIGatewayProxyResponse{
 			StatusCode: 500,
@@ -59,8 +59,6 @@ func handlePrompt(ctx context.Context, request events.APIGatewayProxyRequest) (e
 		}
 		return response, nil 
 	}
-
-	// TODO if err != nil etc.....
 	
 	// Save User ID, Refresh token against this user in DB
 	saveUserAndRefreshTokenToDb(id, email, refresh_token)

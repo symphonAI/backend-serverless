@@ -144,6 +144,19 @@ func NewBackendServerlessStack(scope constructs.Construct, id string, props *Bac
 			Actions:   jsii.Strings("*"),
 		}),
 	)
+
+	// Enable logging Lambda function to Cloudwatch
+	statements = append(statements, 
+		awsiam.NewPolicyStatement(&awsiam.PolicyStatementProps{
+			Effect:    awsiam.Effect_ALLOW,
+			Resources: jsii.Strings("*"),
+			Actions:    &[]*string{
+				jsii.String("logs:CreateLogGroup"),
+				jsii.String("logs:CreateLogStream"),
+				jsii.String("logs:PutLogEvents"),
+			},
+		}),
+	)
 	// userPoolClientResourceInPolicy := aws.StringSlice([]string{*userPoolClient.Ref()})
 	// fmt.Println("User Pool Client Resource:", userPoolClientResourceInPolicy)
 

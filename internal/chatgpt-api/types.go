@@ -1,6 +1,7 @@
 package chatgptapi
 
 type UserFields struct {
-	Prompt string 
+	Prompt      string
 	Temperature string
+	Options     *string
 }

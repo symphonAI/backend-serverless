@@ -29,7 +29,7 @@ func (c *Client) PromptChatGPT(userFields UserFields) (string, error) {
 	req.Header.Add("Content-Type", "application/json")
 	req.Header.Add("Authorization", "Bearer "+c.apiKey)
 
-	fmt.Printf("Req:\n %v", req)
+	fmt.Println("Req:", req)
 
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
@@ -47,16 +47,13 @@ func (c *Client) PromptChatGPT(userFields UserFields) (string, error) {
 		return "", err
 	}
 
-	
-
 	response := ""
 	err = json.Unmarshal(data, &response)
 	if err != nil {
 		return "", err
 	}
 
-	fmt.Printf("Resp:\n %v", response)
-
+	fmt.Println("Resp:", response)
 
 	return response, nil
 }

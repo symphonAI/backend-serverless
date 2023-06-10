@@ -41,6 +41,7 @@ func exchangeCodeForAuthTokens(code string) (string, string, error) {
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
+		fmt.Println("Error calling Spotify for tokens:", err)
 		return "", "", err
 	}
 	defer resp.Body.Close()
@@ -49,6 +50,7 @@ func exchangeCodeForAuthTokens(code string) (string, string, error) {
 
 	if err != nil {
 		// TODO error handling 
+		fmt.Println("Error parsing:", err)
 	}
 
 	var tokenResponse TokenResponse
@@ -57,7 +59,7 @@ func exchangeCodeForAuthTokens(code string) (string, string, error) {
 		return "", "", err
 	}
 
-	fmt.Println("[TEMP] TokenResponse", tokenResponse)
+	fmt.Println("[TEMP] TokenResponse.AccessToken", tokenResponse.AccessToken)
 	return tokenResponse.AccessToken, tokenResponse.RefreshToken, nil
 }
 
@@ -93,7 +95,7 @@ func getUserIdentifiers(accessToken string) (string, string, error){
 		return "", "", err
 	}
 
-	fmt.Println("Successfully retrieved Spotify user data:", data)
+	fmt.Println("Successfully retrieved Spotify user data:", data.Email)
 	return data.ID, data.Email, nil
 
 }

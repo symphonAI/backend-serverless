@@ -38,7 +38,7 @@ func saveUserToCognito(id string, email string) error {
 	userInput := &cognitoidentityprovider.AdminCreateUserInput{
 		UserPoolId:          aws.String(userPoolID),
 		UserAttributes:      userAttributes,
-		Username: &id,
+		Username: &email, // TODO Should we use ID instead?
 		DesiredDeliveryMediums: types.DeliveryMediumTypeEmail.Values(),
 		ForceAliasCreation: false,
 	}

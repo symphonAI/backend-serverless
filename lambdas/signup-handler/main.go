@@ -37,6 +37,9 @@ func handlePrompt(ctx context.Context, request events.APIGatewayProxyRequest) (e
 	}
 	fmt.Println("Successfully generated refresh token and access token.")
 
+	// TEMP LOG
+	fmt.Println("[TEMP] Access token:", access_token)
+
 	// Get User Email
 	id, email, err := getUserIdentifiers(access_token)
 	if err != nil {

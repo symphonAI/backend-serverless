@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"time"
 
@@ -8,6 +9,8 @@ import (
 )
 
 func GenerateJWT(region, email string) (string, error) {
+    fmt.Println("Generating JWT...")
+
 	userPoolID := os.Getenv("COGNITO_USER_POOL_ID")
 	userPoolClientID := os.Getenv("COGNITO_USER_POOL_CLIENT_ID")
 

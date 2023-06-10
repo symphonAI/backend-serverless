@@ -23,7 +23,6 @@ func handlePrompt(ctx context.Context, request events.APIGatewayProxyRequest) (e
 		return response, nil 
 	}
 
-
 	code := requestBody.Code
 
 	fmt.Println("Received auth code:", code)
@@ -39,7 +38,6 @@ func handlePrompt(ctx context.Context, request events.APIGatewayProxyRequest) (e
 	fmt.Println("Successfully generated refresh token and access token.")
 
 	// Get User Email
-	fmt.Println("Getting user data from spotify...")
 	id, email, err := getUserIdentifiers(access_token)
 	if err != nil {
 		response := events.APIGatewayProxyResponse{
@@ -49,7 +47,6 @@ func handlePrompt(ctx context.Context, request events.APIGatewayProxyRequest) (e
 		return response, nil 
 
 	}
-	fmt.Println("Saving user to cognito...")
 	// Save user in Cognito User Pool, retain User ID
 	err = saveUserToCognito(id, email)
 	if err != nil {
@@ -59,12 +56,9 @@ func handlePrompt(ctx context.Context, request events.APIGatewayProxyRequest) (e
 		}
 		return response, nil 
 	}
-
-	fmt.Println("Saving user and refresh token to DB...")
 	
 	// Save User ID, Refresh token against this user in DB
 	saveUserAndRefreshTokenToDb(id, email, refresh_token)
-
 	if err != nil {
 		response := events.APIGatewayProxyResponse{
 			StatusCode: 500,
@@ -72,9 +66,7 @@ func handlePrompt(ctx context.Context, request events.APIGatewayProxyRequest) (e
 		}
 		return response, nil 
 	}
-	fmt.Println("Successfully saved user and refresh token in DB.")
 
-	fmt.Println("Generating JWT...")
 	jwToken, err := GenerateJWT("ap-southeast-2", email)
 	if err != nil {
 		response := events.APIGatewayProxyResponse{

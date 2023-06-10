@@ -61,6 +61,8 @@ func exchangeCodeForAuthTokens(code string) (string, string, error) {
 }
 
 func getUserIdentifiers(accessToken string) (string, string, error){
+	fmt.Println("Getting user data from spotify...")
+
 	url := "https://api.spotify.com/v1/me"
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
@@ -72,21 +74,25 @@ func getUserIdentifiers(accessToken string) (string, string, error){
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
+		fmt.Println("Error requesting Spotify:", err)
 		return "", "", err
 	}
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
+		fmt.Println("Error reading Spotify response:", err)
 		return "", "", err
 	}
 
 	var data SpotifyResponse
 	err = json.Unmarshal(body, &data)
 	if err != nil {
+		fmt.Println("Error parsing Spotify response:", err)
 		return "", "", err
 	}
 
+	fmt.Println("Successfully retrieved Spotify user data:", data)
 	return data.ID, data.Email, nil
 
 }

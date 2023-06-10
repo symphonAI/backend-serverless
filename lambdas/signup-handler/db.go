@@ -13,6 +13,7 @@ import (
 )
 
 func saveUserAndRefreshTokenToDb(userId string, email string, refreshToken string) error {
+	fmt.Println("Saving user and refresh token to DB...")
 	cfg, err := config.LoadDefaultConfig(context.TODO(), config.WithRegion("ap-southeast-2"))
     if err != nil {
         log.Fatalf("unable to load SDK config, %v", err)
@@ -42,10 +43,10 @@ func saveUserAndRefreshTokenToDb(userId string, email string, refreshToken strin
 	// Save the item to DynamoDB
 	_, err = ddb.PutItem(context.TODO(), params)
 	if err != nil {
-		fmt.Println("Failed to save item to DynamoDB:", err)
+		fmt.Println("Failed to save user data to DynamoDB:", err)
 		return err
 	}
 	
-	fmt.Println("Item saved to DynamoDB successfully")
+	fmt.Println("User data saved to DynamoDB successfully")
 	return nil
 }

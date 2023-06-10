@@ -13,6 +13,8 @@ import (
 )
 
 func saveUserToCognito(id string, email string) error {
+	fmt.Println("Saving user to cognito...")
+
 	cfg, err := config.LoadDefaultConfig(context.TODO(), config.WithRegion("ap-southeast-2"))
     if err != nil {
         log.Fatalf("unable to load SDK config, %v", err)

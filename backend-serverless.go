@@ -19,7 +19,6 @@ import (
 	"github.com/aws/jsii-runtime-go"
 )
 
-
 type BackendServerlessStackProps struct {
 	awscdk.StackProps
 }
@@ -56,11 +55,11 @@ func NewBackendServerlessStack(scope constructs.Construct, id string, props *Bac
 			Name: jsii.String("SortKey"),
 			Type: awsdynamodb.AttributeType_STRING,
 		},
-	})	
+	})
 
 	// Create a AWS Cognito user pool
 	userPool := awscognito.NewCfnUserPool(stack, jsii.String("symphonai-user-pool"), &awscognito.CfnUserPoolProps{
-		UserPoolName: jsii.String("symphonai-user-pool"),
+		UserPoolName:           jsii.String("symphonai-user-pool"),
 		AutoVerifiedAttributes: &ptrSlice,
 		Schema: []interface{}{
 			map[string]interface{}{
@@ -80,7 +79,7 @@ func NewBackendServerlessStack(scope constructs.Construct, id string, props *Bac
 	userPoolClient := awscognito.NewCfnUserPoolClient(stack, jsii.String("SymphonAIUserPoolClient"), &awscognito.CfnUserPoolClientProps{
 		UserPoolId: userPool.Ref(),
 	})
-	
+
 	// Create a new api HTTP api on gateway v2.
 	max_age_in_minutes := 10.00
 	api := awsapigatewayv2.NewHttpApi(stack, jsii.String("symphonai-api"), &awsapigatewayv2.HttpApiProps{
@@ -89,22 +88,32 @@ func NewBackendServerlessStack(scope constructs.Construct, id string, props *Bac
 			AllowMethods: &[]awsapigatewayv2.CorsHttpMethod{
 				awsapigatewayv2.CorsHttpMethod_ANY,
 			},
-			AllowHeaders: &[]*string{jsii.String("*")},
+			AllowHeaders:  &[]*string{jsii.String("*")},
 			ExposeHeaders: &[]*string{jsii.String("*")},
-			MaxAge: awscdk.Duration_Minutes(&max_age_in_minutes),
+			MaxAge:        awscdk.Duration_Minutes(&max_age_in_minutes),
 		},
 	})
 
 	// Prompt lambda function.
+
+	promptLambdaEnvVars := make(map[string]*string)
+
+	addSecretCredentialsToEnvVars(promptLambdaEnvVars)
+
+	
+	durationInMinutes := 10.00
+
 	promptFunc := awslambdago.NewGoFunction(stack, jsii.String("prompt-handler"), &awslambdago.GoFunctionProps{
 		MemorySize: jsii.Number(128),
-		ModuleDir: jsii.String("./go.mod"),
+		ModuleDir:  jsii.String("./go.mod"),
 		Entry:      jsii.String("./lambdas/prompt-handler"),
+		Environment: &promptLambdaEnvVars,
+		Timeout:  awscdk.Duration_Minutes(&durationInMinutes),
 	})
 
 	promptIntegration := awsapigatewayv2integrations.NewHttpLambdaIntegration(
-		jsii.String("PromptIntegration"), 
-		promptFunc, 
+		jsii.String("PromptIntegration"),
+		promptFunc,
 		&awsapigatewayv2integrations.HttpLambdaIntegrationProps{})
 
 	api.AddRoutes(&awsapigatewayv2.AddRoutesOptions{
@@ -112,32 +121,31 @@ func NewBackendServerlessStack(scope constructs.Construct, id string, props *Bac
 		Path:        jsii.String("/prompt"),
 	})
 
-
 	// Signup lambda function
-	
+
 	// First, initialise the environment variables
 	// that will go into the lambda function
-    signupLambdaEnvVars := make(map[string]*string)
+	signupLambdaEnvVars := make(map[string]*string)
 
-    // Assign the values to the map
-    signupLambdaEnvVars["COGNITO_USER_POOL_ID"] = userPool.Ref()
-    signupLambdaEnvVars["COGNITO_USER_POOL_CLIENT_ID"] = userPoolClient.Node().Id()
+	// Assign the values to the map
+	signupLambdaEnvVars["COGNITO_USER_POOL_ID"] = userPool.Ref()
+	signupLambdaEnvVars["COGNITO_USER_POOL_CLIENT_ID"] = userPoolClient.Node().Id()
 	signupLambdaEnvVars["DYNAMODB_TABLE_NAME"] = ddbTable.TableName()
 
 	addSecretCredentialsToEnvVars(signupLambdaEnvVars)
-	
+
 	// The role is gonna be a bit of a pain...
 	signupRole := awsiam.NewRole(stack, jsii.String("signup-lambda-role"), &awsiam.RoleProps{
 		AssumedBy: awsiam.NewServicePrincipal(jsii.String("lambda.amazonaws.com"), &awsiam.ServicePrincipalOpts{
 			Region: jsii.String("ap-southeast-2"),
 		}),
 	})
-		
+
 	// Define the policy statements
 	statements := []awsiam.PolicyStatement{}
 	userPoolResourceInPolicy := aws.StringSlice([]string{*userPool.AttrArn()})
 	fmt.Println("User Pool reference ARN:", userPoolResourceInPolicy)
-	statements = append(statements, 
+	statements = append(statements,
 		awsiam.NewPolicyStatement(&awsiam.PolicyStatementProps{
 			Effect:    awsiam.Effect_ALLOW,
 			Resources: &userPoolResourceInPolicy,
@@ -146,11 +154,11 @@ func NewBackendServerlessStack(scope constructs.Construct, id string, props *Bac
 	)
 
 	// Enable logging Lambda function to Cloudwatch
-	statements = append(statements, 
+	statements = append(statements,
 		awsiam.NewPolicyStatement(&awsiam.PolicyStatementProps{
 			Effect:    awsiam.Effect_ALLOW,
 			Resources: jsii.Strings("*"),
-			Actions:    &[]*string{
+			Actions: &[]*string{
 				jsii.String("logs:CreateLogGroup"),
 				jsii.String("logs:CreateLogStream"),
 				jsii.String("logs:PutLogEvents"),
@@ -160,7 +168,7 @@ func NewBackendServerlessStack(scope constructs.Construct, id string, props *Bac
 	// userPoolClientResourceInPolicy := aws.StringSlice([]string{*userPoolClient.Ref()})
 	// fmt.Println("User Pool Client Resource:", userPoolClientResourceInPolicy)
 
-	// statements = append(statements, 
+	// statements = append(statements,
 	// 	awsiam.NewPolicyStatement(&awsiam.PolicyStatementProps{
 	// 		Effect:    awsiam.Effect_ALLOW,
 	// 		Resources: &userPoolClientResourceInPolicy,
@@ -171,7 +179,7 @@ func NewBackendServerlessStack(scope constructs.Construct, id string, props *Bac
 	ddbTableInPolicy := aws.StringSlice([]string{*ddbTable.TableArn()})
 	fmt.Println("DynamoDB resource:", ddbTableInPolicy)
 
-	statements = append(statements, 
+	statements = append(statements,
 		awsiam.NewPolicyStatement(&awsiam.PolicyStatementProps{
 			Effect:    awsiam.Effect_ALLOW,
 			Resources: &ddbTableInPolicy,
@@ -184,22 +192,22 @@ func NewBackendServerlessStack(scope constructs.Construct, id string, props *Bac
 
 	// Create the policy and add the statements and add the role
 	awsiam.NewPolicy(stack, jsii.String("signup-role-policy"), &awsiam.PolicyProps{
-		PolicyName:     aws.String("signup-role-policy"),
-		Statements:     &statements,
-		Roles:          &signupRoleInPolicy,
+		PolicyName: aws.String("signup-role-policy"),
+		Statements: &statements,
+		Roles:      &signupRoleInPolicy,
 	})
 
 	signupFunc := awslambdago.NewGoFunction(stack, jsii.String("signup-handler"), &awslambdago.GoFunctionProps{
-		MemorySize: jsii.Number(128),
-		ModuleDir: jsii.String("./go.mod"),
-		Entry:      jsii.String("./lambdas/signup-handler"),
+		MemorySize:  jsii.Number(128),
+		ModuleDir:   jsii.String("./go.mod"),
+		Entry:       jsii.String("./lambdas/signup-handler"),
 		Environment: &signupLambdaEnvVars,
-		Role: signupRole,
+		Role:        signupRole,
 	})
 
 	signupIntegration := awsapigatewayv2integrations.NewHttpLambdaIntegration(
-		jsii.String("SignupIntegration"), 
-		signupFunc, 
+		jsii.String("SignupIntegration"),
+		signupFunc,
 		&awsapigatewayv2integrations.HttpLambdaIntegrationProps{})
 
 	api.AddRoutes(&awsapigatewayv2.AddRoutesOptions{
@@ -224,7 +232,7 @@ func addSecretCredentialsToEnvVars(envVars map[string]*string) error {
 
 	decrypt := true
 	input := &ssm.GetParameterInput{
-		Name: &parameterName,
+		Name:           &parameterName,
 		WithDecryption: &decrypt,
 	}
 
@@ -272,7 +280,7 @@ func main() {
 // be deployed. For more information see: https://docs.aws.amazon.com/cdk/latest/guide/environments.html
 func env() *awscdk.Environment {
 	return &awscdk.Environment{
-	 Account: jsii.String("349564020337"),
-	 Region:  jsii.String("ap-southeast-2"),
+		Account: jsii.String("349564020337"),
+		Region:  jsii.String("ap-southeast-2"),
 	}
 }

@@ -4,25 +4,35 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io"
+	"io/ioutil"
 	"net/http"
-	"os"
+	"strconv"
 )
 
 func (c *Client) PromptChatGPT(userFields UserFields) (string, error) {
-	endpoint := BaseURL + "/chat/completions"
+	endpoint := BaseURL + "/completions"
 
 	fmt.Println("User fields:", userFields)
 	fmt.Println("Endpoint:", endpoint)
 
-	body := []byte(`{
-		"model":` + os.Getenv("OPENAI_MODEL") + `,
-		"prompt": "` + userFields.Prompt + `",
-		"max_tokens": ` + os.Getenv("OPENAI_MAX_TOKENS") + `,
-		"temperature":` + userFields.Temperature + `,
-		`)
+	floatTemperature, err := strconv.ParseFloat(userFields.Temperature, 64)
+	if err != nil {
+		return "", err
+	}
 
-	req, err := http.NewRequest("POST", endpoint, bytes.NewBuffer(body))
+	payload := map[string]interface{}{
+		"model":       "text-davinci-003",
+		"max_tokens":  2000,
+		"temperature": floatTemperature,
+		"prompt":      userFields.Prompt,
+	}
+
+	jsonPayload, err := json.Marshal(payload)
+	if err != nil {
+		return "", err
+	}
+
+	req, err := http.NewRequest("POST", endpoint, bytes.NewBuffer(jsonPayload))
 	if err != nil {
 		return "", err
 	}
@@ -37,23 +47,23 @@ func (c *Client) PromptChatGPT(userFields UserFields) (string, error) {
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode != http.StatusOK {
-		err := fmt.Errorf("unexpected status code %d", resp.StatusCode)
-		return "", err
-	}
+	fmt.Println("Resp:", resp)
 
-	data, err := io.ReadAll(resp.Body)
+	responseBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return "", err
 	}
 
-	response := ""
-	err = json.Unmarshal(data, &response)
+	fmt.Println("Resp:", string(responseBody))
+
+	response := ChatGPTResponse{}
+	err = json.Unmarshal(responseBody, &response)
 	if err != nil {
 		return "", err
 	}
 
-	fmt.Println("Resp:", response)
 
-	return response, nil
+	fmt.Println("Resp:", response.Choices[0].Text)
+
+	return response.Choices[0].Text, nil
 }

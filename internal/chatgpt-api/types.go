@@ -5,3 +5,9 @@ type UserFields struct {
 	Temperature string
 	Options     *string
 }
+
+type ChatGPTResponse struct {
+	Choices []struct {
+		Text string `json:"text"`
+	} `json:"choices"`
+}

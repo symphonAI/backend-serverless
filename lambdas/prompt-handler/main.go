@@ -53,10 +53,11 @@ func handlePrompt(ctx context.Context, request events.APIGatewayProxyRequest) (e
 		}, err
 	}
 
-	fmt.Println(chatgptResponse)
+	fmt.Println("Chat GPT Response:", chatgptResponse)
 
 	response := events.APIGatewayProxyResponse{
 		StatusCode: http.StatusOK,
+		Body:       chatgptResponse,
 	}
 
 	return response, nil

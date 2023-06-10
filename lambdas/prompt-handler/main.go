@@ -2,7 +2,7 @@
 package main
 
 import (
-	"context"
+	"fmt"
 	"net/http"
 
 	chatgptapi "backend-serverless/internal/chatgpt-api"
@@ -15,16 +15,19 @@ type config struct {
 	chatgptClient chatgptapi.Client
 }
 
-func handlePrompt(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-
+func handlePrompt(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+	fmt.Println("Prompt called")
 	cfg := config{
 		chatgptClient: chatgptapi.NewClient(),
 	}
+	fmt.Println(request)
+
 	// call chatGPT api
-	userFields := chatgptapi.UserFields {
-		Prompt: "Hello. This is Squid.",
+	userFields := chatgptapi.UserFields{
+		Prompt:      "Hello. This is Squid.",
 		Temperature: "0.9",
 	}
+	
 
 	chatgptResponse, err := cfg.chatgptClient.PromptChatGPT(userFields)
 	if err != nil {
@@ -33,11 +36,10 @@ func handlePrompt(ctx context.Context, request events.APIGatewayProxyRequest) (e
 		}, err
 	}
 
-
+	fmt.Println(chatgptResponse)
 
 	response := events.APIGatewayProxyResponse{
-		StatusCode: http.StatusOK, 
-		Body:       chatgptResponse,
+		StatusCode: http.StatusOK,
 	}
 
 	return response, nil

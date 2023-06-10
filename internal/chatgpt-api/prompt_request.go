@@ -10,21 +10,26 @@ import (
 )
 
 func (c *Client) PromptChatGPT(userFields UserFields) (string, error) {
-	endpoint := BaseURL + "/chat"
+	endpoint := BaseURL + "/chat/completions"
+
+	fmt.Println("User fields:", userFields)
+	fmt.Println("Endpoint:", endpoint)
 
 	body := []byte(`{
-		"model":` + os.Getenv("OPENAI_MODEL") +`,
+		"model":` + os.Getenv("OPENAI_MODEL") + `,
 		"prompt": "` + userFields.Prompt + `",
-		"max_tokens": ` + os.Getenv("OPENAI_MAX_TOKENS") +`,
+		"max_tokens": ` + os.Getenv("OPENAI_MAX_TOKENS") + `,
 		"temperature":` + userFields.Temperature + `,
 		`)
-	
+
 	req, err := http.NewRequest("POST", endpoint, bytes.NewBuffer(body))
 	if err != nil {
 		return "", err
 	}
 	req.Header.Add("Content-Type", "application/json")
-	req.Header.Add("Authorization", "Bearer " + c.apiKey)
+	req.Header.Add("Authorization", "Bearer "+c.apiKey)
+
+	fmt.Printf("Req:\n %v", req)
 
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
@@ -42,11 +47,16 @@ func (c *Client) PromptChatGPT(userFields UserFields) (string, error) {
 		return "", err
 	}
 
+	
+
 	response := ""
 	err = json.Unmarshal(data, &response)
 	if err != nil {
 		return "", err
 	}
+
+	fmt.Printf("Resp:\n %v", response)
+
 
 	return response, nil
 }

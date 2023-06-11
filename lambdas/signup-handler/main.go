@@ -89,6 +89,7 @@ func handlePrompt(ctx context.Context, request events.APIGatewayProxyRequest) (e
 	response := events.APIGatewayProxyResponse{
 		StatusCode: http.StatusOK, 
 		Body: "Successfully authenticated",
+		Headers: headers,
 	}
 
 	return response, nil

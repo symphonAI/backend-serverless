@@ -3,7 +3,7 @@ package main
 type PromptRequestBody struct {
 	Prompt      string   `json:"prompt"`
 	Temperature string   `json:"temperature"`
-	Options     []string `json:"options`
+	Options     []string `json:"options"`
 }
 
 type Track struct {

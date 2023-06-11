@@ -59,7 +59,6 @@ func exchangeCodeForAuthTokens(code string) (string, string, error) {
 		return "", "", err
 	}
 
-	fmt.Println("[TEMP] TokenResponse.AccessToken", tokenResponse.AccessToken)
 	return tokenResponse.RefreshToken, tokenResponse.AccessToken, nil
 }
 

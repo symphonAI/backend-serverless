@@ -43,9 +43,6 @@ func handlePrompt(ctx context.Context, request events.APIGatewayProxyRequest) (e
 	}
 	fmt.Println("Successfully generated refresh token and access token.")
 
-	// TEMP LOG
-	fmt.Println("[TEMP] Access token:", access_token)
-
 	// Get User Email
 	id, email, err := getUserIdentifiers(access_token)
 	if err != nil {
@@ -56,16 +53,6 @@ func handlePrompt(ctx context.Context, request events.APIGatewayProxyRequest) (e
 		}
 		return response, errors.New(errorString) 
 
-	}
-	// Save user in Cognito User Pool, retain User ID
-	err = saveUserToCognito(id, email)
-	if err != nil {
-		errorString := fmt.Sprintf("unable to save user in Cognito user pool: %s", err.Error())
-		response := events.APIGatewayProxyResponse{
-			StatusCode: 500,
-			Body:       errorString,
-		}
-		return response, errors.New(errorString)
 	}
 	
 	// Save User ID, Refresh token against this user in DB

@@ -81,7 +81,8 @@ func handlePrompt(ctx context.Context, request events.APIGatewayProxyRequest) (e
         Value:    jwToken,
         Expires:  time.Now().Add(24 * time.Hour),
         HttpOnly: true,
-        Secure:   true, // Make sure your API Gateway has HTTPS enabled
+		SameSite: http.SameSiteNoneMode,
+        Secure:   true,
     }
 	headers := make(map[string]string)
     headers["Set-Cookie"] = cookie.String()

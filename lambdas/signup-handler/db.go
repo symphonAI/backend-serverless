@@ -23,9 +23,9 @@ func saveUserAndRefreshTokenToDb(userId string, email string, refreshToken strin
 
 	user := User{
 		PartitionKey: "USER",
-		SortKey: userId,
+		SortKey: email,
 		RefreshToken: refreshToken,
-		Email: email,
+		Username: userId,
 	}
 	
 	ddbitem, err := attributevalue.MarshalMap(user)

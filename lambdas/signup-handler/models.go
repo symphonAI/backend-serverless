@@ -4,5 +4,5 @@ type User struct {
 	PartitionKey string
 	SortKey string
 	RefreshToken string
-	Email string
+	Username string
 }

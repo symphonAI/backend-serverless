@@ -66,7 +66,7 @@ func NewBackendServerlessStack(scope constructs.Construct, id string, props *Bac
 	addSecretCredentialsToEnvVars(customAuthorizerEnvVars)
 
 	// Custom Authorizer
-	customAuthorizerFunc := awslambdago.NewGoFunction(stack, jsii.String("test-auth-handler"), &awslambdago.GoFunctionProps{
+	customAuthorizerFunc := awslambdago.NewGoFunction(stack, jsii.String("custom-authorizer-lambda"), &awslambdago.GoFunctionProps{
 		MemorySize:  jsii.Number(128),
 		ModuleDir:   jsii.String("./go.mod"),
 		Entry:       jsii.String("./lambdas/custom-authorizer"),
@@ -79,7 +79,7 @@ func NewBackendServerlessStack(scope constructs.Construct, id string, props *Bac
 	identitySources = append(identitySources, &str)
 
 	authorizer := awsapigatewayv2.NewHttpAuthorizer(
-		scope, 
+		stack, 
 		jsii.String("custom-authorizer"),
 		&awsapigatewayv2.HttpAuthorizerProps{
 				HttpApi: api,
@@ -114,8 +114,8 @@ func NewBackendServerlessStack(scope constructs.Construct, id string, props *Bac
 		Integration: promptIntegration,
 		Path:        jsii.String("/prompt"),
 		Authorizer: awsapigatewayv2.HttpAuthorizer_FromHttpAuthorizerAttributes(
-			scope, 
-			jsii.String("custom-auth"), 
+			stack, 
+			jsii.String("custom-auth-for-prompt"), 
 			&awsapigatewayv2.HttpAuthorizerAttributes{
 				AuthorizerId: authorizer.AuthorizerId(),
 				AuthorizerType: jsii.String("CUSTOM"),
@@ -217,8 +217,8 @@ func NewBackendServerlessStack(scope constructs.Construct, id string, props *Bac
 		Path:        jsii.String("/test-auth"),
 		Methods: &[]awsapigatewayv2.HttpMethod{awsapigatewayv2.HttpMethod_GET},
 		Authorizer: awsapigatewayv2.HttpAuthorizer_FromHttpAuthorizerAttributes(
-			scope, 
-			jsii.String("custom-auth"), 
+			stack, 
+			jsii.String("custom-auth-for-test"), 
 			&awsapigatewayv2.HttpAuthorizerAttributes{
 				AuthorizerId: authorizer.AuthorizerId(),
 				AuthorizerType: jsii.String("CUSTOM"),

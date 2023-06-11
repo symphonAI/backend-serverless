@@ -9,6 +9,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -88,10 +89,19 @@ func handlePrompt(ctx context.Context, request events.APIGatewayProxyRequest) (e
 		return response, errors.New(errorString)
 	}
 
-	fmt.Println("Successfully generated JWT. Returning JWT in response...")
+	cookie := &http.Cookie{
+        Name:     "jwt",
+        Value:    jwToken,
+        Expires:  time.Now().Add(24 * time.Hour),
+        HttpOnly: true,
+        Secure:   true, // Make sure your API Gateway has HTTPS enabled
+    }
+	headers := make(map[string]string)
+    headers["Set-Cookie"] = cookie.String()
+
 	response := events.APIGatewayProxyResponse{
 		StatusCode: http.StatusOK, 
-		Body: jwToken,
+		Body: "Successfully authenticated",
 	}
 
 	return response, nil

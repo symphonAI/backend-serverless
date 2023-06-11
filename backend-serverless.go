@@ -8,7 +8,6 @@ import (
 	"github.com/aws/aws-cdk-go/awscdk"
 	"github.com/aws/aws-cdk-go/awscdk/awsapigatewayv2"
 	"github.com/aws/aws-cdk-go/awscdk/awsapigatewayv2integrations"
-	"github.com/aws/aws-cdk-go/awscdk/awscognito"
 	"github.com/aws/aws-cdk-go/awscdk/awsdynamodb"
 	"github.com/aws/aws-cdk-go/awscdk/awsiam"
 	"github.com/aws/aws-cdk-go/awscdk/awslambda"
@@ -31,16 +30,6 @@ func NewBackendServerlessStack(scope constructs.Construct, id string, props *Bac
 	}
 	stack := awscdk.NewStack(scope, &id, &sprops)
 
-	strSlice := []string{
-		"email",
-	}
-
-	// Convert []string to []*string
-	var ptrSlice []*string
-	for _, str := range strSlice {
-		ptrSlice = append(ptrSlice, &str)
-	}
-
 	// DynamoDB table
 	// Going with single-table design here,
 	// So given generic names to the PartitionKey
@@ -58,29 +47,6 @@ func NewBackendServerlessStack(scope constructs.Construct, id string, props *Bac
 		},
 	})
 
-	// Create a AWS Cognito user pool
-	userPool := awscognito.NewCfnUserPool(stack, jsii.String("symphonai-user-pool"), &awscognito.CfnUserPoolProps{
-		UserPoolName:           jsii.String("symphonai-user-pool"),
-		AutoVerifiedAttributes: &ptrSlice,
-		Schema: []interface{}{
-			map[string]interface{}{
-				"attributeDataType": "String",
-				"name":              "email",
-				"mutable":           true,
-				"required":          true,
-			},
-			map[string]interface{}{
-				"attributeDataType": "String",
-				"name":              "name",
-				"mutable":           true,
-				"required":          false,
-			},
-		}})
-
-	userPoolClient := awscognito.NewCfnUserPoolClient(stack, jsii.String("SymphonAIUserPoolClient"), &awscognito.CfnUserPoolClientProps{
-		UserPoolId: userPool.Ref(),
-	})
-
 	// Create a new api HTTP api on gateway v2.
 	max_age_in_minutes := 10.00
 	api := awsapigatewayv2.NewHttpApi(stack, jsii.String("symphonai-api"), &awsapigatewayv2.HttpApiProps{
@@ -94,6 +60,33 @@ func NewBackendServerlessStack(scope constructs.Construct, id string, props *Bac
 			MaxAge:        awscdk.Duration_Minutes(&max_age_in_minutes),
 		},
 	})
+
+	customAuthorizerEnvVars := make(map[string]*string)
+
+	addSecretCredentialsToEnvVars(customAuthorizerEnvVars)
+
+	// Custom Authorizer
+	customAuthorizerFunc := awslambdago.NewGoFunction(stack, jsii.String("test-auth-handler"), &awslambdago.GoFunctionProps{
+		MemorySize:  jsii.Number(128),
+		ModuleDir:   jsii.String("./go.mod"),
+		Entry:       jsii.String("./lambdas/custom-authorizer"),
+		Environment: &customAuthorizerEnvVars,
+		Runtime: awslambda.Runtime_GO_1_X(),
+	})
+
+	str := "$request.header.Authorization"
+	identitySources := []*string{}
+	identitySources = append(identitySources, &str)
+
+	authorizer := awsapigatewayv2.NewHttpAuthorizer(
+		scope, 
+		jsii.String("custom-authorizer"),
+		&awsapigatewayv2.HttpAuthorizerProps{
+				HttpApi: api,
+				IdentitySource: &identitySources,
+				Type: awsapigatewayv2.HttpAuthorizerType_LAMBDA,
+				AuthorizerUri: customAuthorizerFunc.FunctionArn(),
+		})
 
 	// Prompt lambda function.
 
@@ -120,6 +113,13 @@ func NewBackendServerlessStack(scope constructs.Construct, id string, props *Bac
 	api.AddRoutes(&awsapigatewayv2.AddRoutesOptions{
 		Integration: promptIntegration,
 		Path:        jsii.String("/prompt"),
+		Authorizer: awsapigatewayv2.HttpAuthorizer_FromHttpAuthorizerAttributes(
+			scope, 
+			jsii.String("custom-auth"), 
+			&awsapigatewayv2.HttpAuthorizerAttributes{
+				AuthorizerId: authorizer.AuthorizerId(),
+				AuthorizerType: jsii.String("CUSTOM"),
+			}),
 		Methods: &[]awsapigatewayv2.HttpMethod{awsapigatewayv2.HttpMethod_POST},
 	})
 
@@ -130,8 +130,6 @@ func NewBackendServerlessStack(scope constructs.Construct, id string, props *Bac
 	signupLambdaEnvVars := make(map[string]*string)
 
 	// Assign the values to the map
-	signupLambdaEnvVars["COGNITO_USER_POOL_ID"] = userPool.Ref()
-	signupLambdaEnvVars["COGNITO_USER_POOL_CLIENT_ID"] = userPoolClient.Node().Id()
 	signupLambdaEnvVars["DYNAMODB_TABLE_NAME"] = ddbTable.TableName()
 
 	addSecretCredentialsToEnvVars(signupLambdaEnvVars)
@@ -145,15 +143,6 @@ func NewBackendServerlessStack(scope constructs.Construct, id string, props *Bac
 
 	// Define the policy statements
 	statements := []awsiam.PolicyStatement{}
-	userPoolResourceInPolicy := aws.StringSlice([]string{*userPool.AttrArn()})
-	fmt.Println("User Pool reference ARN:", userPoolResourceInPolicy)
-	statements = append(statements,
-		awsiam.NewPolicyStatement(&awsiam.PolicyStatementProps{
-			Effect:    awsiam.Effect_ALLOW,
-			Resources: &userPoolResourceInPolicy,
-			Actions:   jsii.Strings("*"),
-		}),
-	)
 
 	// Enable logging Lambda function to Cloudwatch
 	statements = append(statements,
@@ -167,16 +156,6 @@ func NewBackendServerlessStack(scope constructs.Construct, id string, props *Bac
 			},
 		}),
 	)
-	// userPoolClientResourceInPolicy := aws.StringSlice([]string{*userPoolClient.Ref()})
-	// fmt.Println("User Pool Client Resource:", userPoolClientResourceInPolicy)
-
-	// statements = append(statements,
-	// 	awsiam.NewPolicyStatement(&awsiam.PolicyStatementProps{
-	// 		Effect:    awsiam.Effect_ALLOW,
-	// 		Resources: &userPoolClientResourceInPolicy,
-	// 		Actions:   jsii.Strings("*"),
-	// 	}),
-	// )
 
 	ddbTableInPolicy := aws.StringSlice([]string{*ddbTable.TableArn()})
 	fmt.Println("DynamoDB resource:", ddbTableInPolicy)
@@ -219,7 +198,6 @@ func NewBackendServerlessStack(scope constructs.Construct, id string, props *Bac
 		Methods: &[]awsapigatewayv2.HttpMethod{awsapigatewayv2.HttpMethod_POST},
 	})
 
-
 	// Test-Auth Handler
 	testAuthFunc := awslambdago.NewGoFunction(stack, jsii.String("test-auth-handler"), &awslambdago.GoFunctionProps{
 		MemorySize:  jsii.Number(128),
@@ -238,6 +216,13 @@ func NewBackendServerlessStack(scope constructs.Construct, id string, props *Bac
 		Integration: testAuthIntegration,
 		Path:        jsii.String("/test-auth"),
 		Methods: &[]awsapigatewayv2.HttpMethod{awsapigatewayv2.HttpMethod_GET},
+		Authorizer: awsapigatewayv2.HttpAuthorizer_FromHttpAuthorizerAttributes(
+			scope, 
+			jsii.String("custom-auth"), 
+			&awsapigatewayv2.HttpAuthorizerAttributes{
+				AuthorizerId: authorizer.AuthorizerId(),
+				AuthorizerType: jsii.String("CUSTOM"),
+			}),
 	})
 
 	return stack

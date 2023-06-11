@@ -11,6 +11,7 @@ import (
 	"github.com/aws/aws-cdk-go/awscdk/awscognito"
 	"github.com/aws/aws-cdk-go/awscdk/awsdynamodb"
 	"github.com/aws/aws-cdk-go/awscdk/awsiam"
+	"github.com/aws/aws-cdk-go/awscdk/awslambda"
 	"github.com/aws/aws-cdk-go/awscdk/awslambdago"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
@@ -108,6 +109,7 @@ func NewBackendServerlessStack(scope constructs.Construct, id string, props *Bac
 		Entry:      jsii.String("./lambdas/prompt-handler"),
 		Environment: &promptLambdaEnvVars,
 		Timeout:  awscdk.Duration_Minutes(&durationInMinutes),
+		Runtime: awslambda.Runtime_GO_1_X(),
 	})
 
 	promptIntegration := awsapigatewayv2integrations.NewHttpLambdaIntegration(
@@ -202,6 +204,7 @@ func NewBackendServerlessStack(scope constructs.Construct, id string, props *Bac
 		Entry:       jsii.String("./lambdas/signup-handler"),
 		Environment: &signupLambdaEnvVars,
 		Role:        signupRole,
+		Runtime: awslambda.Runtime_GO_1_X(),
 	})
 
 	signupIntegration := awsapigatewayv2integrations.NewHttpLambdaIntegration(
@@ -212,6 +215,26 @@ func NewBackendServerlessStack(scope constructs.Construct, id string, props *Bac
 	api.AddRoutes(&awsapigatewayv2.AddRoutesOptions{
 		Integration: signupIntegration,
 		Path:        jsii.String("/signup"),
+	})
+
+
+	// Test-Auth Handler
+	testAuthFunc := awslambdago.NewGoFunction(stack, jsii.String("test-auth-handler"), &awslambdago.GoFunctionProps{
+		MemorySize:  jsii.Number(128),
+		ModuleDir:   jsii.String("./go.mod"),
+		Entry:       jsii.String("./lambdas/test-auth-handler"),
+		Environment: &signupLambdaEnvVars,
+		Runtime: awslambda.Runtime_GO_1_X(),
+	})
+
+	testAuthIntegration := awsapigatewayv2integrations.NewHttpLambdaIntegration(
+		jsii.String("SignupIntegration"),
+		testAuthFunc,
+		&awsapigatewayv2integrations.HttpLambdaIntegrationProps{})
+
+	api.AddRoutes(&awsapigatewayv2.AddRoutesOptions{
+		Integration: testAuthIntegration,
+		Path:        jsii.String("/test-auth"),
 	})
 
 	return stack

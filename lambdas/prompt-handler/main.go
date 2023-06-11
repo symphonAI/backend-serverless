@@ -8,20 +8,21 @@ import (
 	"fmt"
 	"net/http"
 
-	chatgptapi "backend-serverless/internal/chatgpt-api"
+	promptengineering "backend-serverless/internal/prompt-engineering"
+	symphonapi "backend-serverless/internal/symphon-api"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 )
 
 type config struct {
-	chatgptClient chatgptapi.Client
+	symphonapiClient symphonapi.Client
 }
 
 func handlePrompt(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	fmt.Println("Prompt called")
 	cfg := config{
-		chatgptClient: chatgptapi.NewClient(),
+		symphonapiClient: symphonapi.NewClient(),
 	}
 
 	requestBody := PromptRequestBody{}
@@ -35,18 +36,55 @@ func handlePrompt(ctx context.Context, request events.APIGatewayProxyRequest) (e
 		return response, errors.New(errorString)
 	}
 
-	fmt.Println("Received prompt:", requestBody.Prompt)
-	fmt.Println("Received temperature:", requestBody.Temperature)
+	prompt := requestBody.Prompt
+	temperature := requestBody.Temperature
+	options := requestBody.Options
 
+	fmt.Println("Received prompt:", prompt)
+	fmt.Println("Received temperature:", temperature)
+	fmt.Println("Received options:", options)
+
+	// get top bands and tracks concurrently
+	bandChannel := make(chan symphonapi.SpotifyResult)
+	trackChannel := make(chan symphonapi.SpotifyResult)
+
+	go cfg.symphonapiClient.GetTopBandsSpotify(bandChannel)
+	go cfg.symphonapiClient.GetTopTracksSpotify(trackChannel)
+
+	topBands := <-bandChannel
+	topTracks := <-trackChannel
+
+	if topBands.Error != nil {
+		return events.APIGatewayProxyResponse{
+			StatusCode: http.StatusInternalServerError,
+		}, err
+	}
+	if topTracks.Error != nil {
+		return events.APIGatewayProxyResponse{
+			StatusCode: http.StatusInternalServerError,
+		}, err
+	}
+
+	// engineer prompt
+	engineeredPrompt, err := promptengineering.EngineerPrompt(
+		prompt,
+		topBands.Message,
+		topTracks.Message,
+		options,
+	)
+	if err != nil {
+		return events.APIGatewayProxyResponse{
+			StatusCode: http.StatusInternalServerError,
+		}, err
+	}
 
 	// call chatGPT api
-	userFields := chatgptapi.UserFields{
-		Prompt:      requestBody.Prompt,
-		Temperature: requestBody.Temperature,
+	userFields := symphonapi.UserFields{
+		Prompt:      engineeredPrompt,
+		Temperature: temperature,
 	}
-	
 
-	chatgptResponse, err := cfg.chatgptClient.PromptChatGPT(userFields)
+	chatgptResponse, err := cfg.symphonapiClient.PromptChatGPT(userFields)
 	if err != nil {
 		return events.APIGatewayProxyResponse{
 			StatusCode: http.StatusInternalServerError,
@@ -55,6 +93,9 @@ func handlePrompt(ctx context.Context, request events.APIGatewayProxyRequest) (e
 
 	fmt.Println("Chat GPT Response:", chatgptResponse)
 
+	// build spotify playlist here
+
+	// return response
 	response := events.APIGatewayProxyResponse{
 		StatusCode: http.StatusOK,
 		Body:       chatgptResponse,

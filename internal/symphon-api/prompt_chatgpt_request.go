@@ -1,4 +1,4 @@
-package chatgptapi
+package symphonapi
 
 import (
 	"bytes"

@@ -78,7 +78,8 @@ func NewBackendServerlessStack(scope constructs.Construct, id string, props *Bac
 	identitySources := []*string{}
 	identitySources = append(identitySources, &str)
 
-	authorizerUri := fmt.Sprintf("arn:aws:apigateway:ap-southeast-2:lambda:path/2015-03-31/functions/%v/invocations", customAuthorizerFunc.FunctionArn())
+	authorizerLambdaArn := customAuthorizerFunc.FunctionArn()
+	authorizerUri := "arn:aws:apigateway:ap-southeast-2:lambda:path/2015-03-31/functions/" + *authorizerLambdaArn + "/invocations"
 	authorizer := awsapigatewayv2.NewHttpAuthorizer(
 		stack, 
 		jsii.String("custom-authorizer"),

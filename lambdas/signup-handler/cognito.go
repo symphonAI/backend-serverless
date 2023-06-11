@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -46,6 +47,12 @@ func saveUserToCognito(id string, email string) error {
 	// Create the user in the user pool.
 	_, err = cognitoClient.AdminCreateUser(context.TODO(), userInput)
 	if err != nil {
+		// Don't mind if the username exists
+		var usernameExistsErr *types.UsernameExistsException
+		if errors.As(err, &usernameExistsErr) {
+			fmt.Println("Username already exists. Ignoring error.")
+			return nil // Return nil to indicate success without error.
+		}
 		fmt.Println("Error saving user in Cognito user pool:", err)
 		return err
 	}

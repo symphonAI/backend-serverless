@@ -120,6 +120,7 @@ func NewBackendServerlessStack(scope constructs.Construct, id string, props *Bac
 	api.AddRoutes(&awsapigatewayv2.AddRoutesOptions{
 		Integration: promptIntegration,
 		Path:        jsii.String("/prompt"),
+		Methods: &[]awsapigatewayv2.HttpMethod{awsapigatewayv2.HttpMethod_POST},
 	})
 
 	// Signup lambda function
@@ -215,6 +216,7 @@ func NewBackendServerlessStack(scope constructs.Construct, id string, props *Bac
 	api.AddRoutes(&awsapigatewayv2.AddRoutesOptions{
 		Integration: signupIntegration,
 		Path:        jsii.String("/signup"),
+		Methods: &[]awsapigatewayv2.HttpMethod{awsapigatewayv2.HttpMethod_POST},
 	})
 
 
@@ -235,6 +237,7 @@ func NewBackendServerlessStack(scope constructs.Construct, id string, props *Bac
 	api.AddRoutes(&awsapigatewayv2.AddRoutesOptions{
 		Integration: testAuthIntegration,
 		Path:        jsii.String("/test-auth"),
+		Methods: &[]awsapigatewayv2.HttpMethod{awsapigatewayv2.HttpMethod_GET},
 	})
 
 	return stack

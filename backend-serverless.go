@@ -57,7 +57,7 @@ func NewBackendServerlessStack(scope constructs.Construct, id string, props *Bac
 				awsapigatewayv2.CorsHttpMethod_ANY,
 			},
 			AllowCredentials: &allowCredentials,
-			AllowHeaders:  &[]*string{jsii.String("*")},
+			AllowHeaders:  &[]*string{jsii.String("Content-Type")},
 			ExposeHeaders: &[]*string{jsii.String("*")},
 			MaxAge:        awscdk.Duration_Minutes(&max_age_in_minutes),
 		},

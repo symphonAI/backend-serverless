@@ -78,6 +78,7 @@ func NewBackendServerlessStack(scope constructs.Construct, id string, props *Bac
 	identitySources := []*string{}
 	identitySources = append(identitySources, &str)
 
+	authorizerUri := fmt.Sprintf("arn:aws:apigateway:ap-southeast-2:lambda:path/2015-03-31/functions/%v/invocations", customAuthorizerFunc.FunctionArn())
 	authorizer := awsapigatewayv2.NewHttpAuthorizer(
 		stack, 
 		jsii.String("custom-authorizer"),
@@ -85,8 +86,9 @@ func NewBackendServerlessStack(scope constructs.Construct, id string, props *Bac
 				HttpApi: api,
 				IdentitySource: &identitySources,
 				Type: awsapigatewayv2.HttpAuthorizerType_LAMBDA,
-				AuthorizerUri: customAuthorizerFunc.FunctionArn(),
+				AuthorizerUri: &authorizerUri,
 		})
+
 
 	// Prompt lambda function.
 

@@ -119,6 +119,10 @@ func NewBackendServerlessStack(scope constructs.Construct, id string, props *Bac
 		Runtime: awslambda.Runtime_GO_1_X(),
 	})
 
+	str := "$request.header.cookie"
+	identitySources := []*string{}
+	identitySources = append(identitySources, &str)
+
 	authorizerLambdaArn := customAuthorizerFunc.FunctionArn()
 	authorizerUri := "arn:aws:apigateway:ap-southeast-2:lambda:path/2015-03-31/functions/" + *authorizerLambdaArn + "/invocations"
 	authorizer := awsapigatewayv2.NewHttpAuthorizer(
@@ -128,6 +132,7 @@ func NewBackendServerlessStack(scope constructs.Construct, id string, props *Bac
 				HttpApi: api,
 				Type: awsapigatewayv2.HttpAuthorizerType_LAMBDA,
 				AuthorizerUri: &authorizerUri,
+				IdentitySource: &identitySources,
 		})
 
 

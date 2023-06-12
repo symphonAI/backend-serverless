@@ -64,8 +64,51 @@ func NewBackendServerlessStack(scope constructs.Construct, id string, props *Bac
 	})
 
 	customAuthorizerEnvVars := make(map[string]*string)
-
+	customAuthorizerEnvVars["DYNAMODB_TABLE_NAME"] = ddbTable.TableName()
 	addSecretCredentialsToEnvVars(customAuthorizerEnvVars)
+
+	// Custom Authorizer - Role
+	customAuthorizerRole := awsiam.NewRole(stack, jsii.String("custom-authorizer-role"), &awsiam.RoleProps{
+		AssumedBy: awsiam.NewServicePrincipal(jsii.String("lambda.amazonaws.com"), &awsiam.ServicePrincipalOpts{
+			Region: jsii.String("ap-southeast-2"),
+		}),
+	})
+
+	// Define the policy statements
+	customAuthStatements := []awsiam.PolicyStatement{}
+
+	// Enable logging Lambda function to Cloudwatch
+	customAuthStatements = append(customAuthStatements,
+		awsiam.NewPolicyStatement(&awsiam.PolicyStatementProps{
+			Effect:    awsiam.Effect_ALLOW,
+			Resources: jsii.Strings("*"),
+			Actions: &[]*string{
+				jsii.String("logs:CreateLogGroup"),
+				jsii.String("logs:CreateLogStream"),
+				jsii.String("logs:PutLogEvents"),
+			},
+		}),
+	)
+
+	ddbTableInPolicy := aws.StringSlice([]string{*ddbTable.TableArn()})
+	fmt.Println("DynamoDB resource:", ddbTableInPolicy)
+
+	customAuthStatements = append(customAuthStatements,
+		awsiam.NewPolicyStatement(&awsiam.PolicyStatementProps{
+			Effect:    awsiam.Effect_ALLOW,
+			Resources: &ddbTableInPolicy,
+			Actions:   jsii.Strings("dynamodb:GetItem"),
+		}),
+	)
+
+	customAuthRoleInPolicy := []awsiam.IRole{customAuthorizerRole}
+	fmt.Println("CustomAuthRole resource:", customAuthRoleInPolicy)
+
+	awsiam.NewPolicy(stack, jsii.String("customauth-role-policy"), &awsiam.PolicyProps{
+		PolicyName: aws.String("customauth-role-policy"),
+		Statements: &customAuthStatements,
+		Roles:      &customAuthRoleInPolicy,
+	})
 
 	// Custom Authorizer
 	customAuthorizerFunc := awslambdago.NewGoFunction(stack, jsii.String("custom-authorizer-lambda"), &awslambdago.GoFunctionProps{
@@ -76,10 +119,6 @@ func NewBackendServerlessStack(scope constructs.Construct, id string, props *Bac
 		Runtime: awslambda.Runtime_GO_1_X(),
 	})
 
-	str := "$request.header.cookie"
-	identitySources := []*string{}
-	identitySources = append(identitySources, &str)
-
 	authorizerLambdaArn := customAuthorizerFunc.FunctionArn()
 	authorizerUri := "arn:aws:apigateway:ap-southeast-2:lambda:path/2015-03-31/functions/" + *authorizerLambdaArn + "/invocations"
 	authorizer := awsapigatewayv2.NewHttpAuthorizer(
@@ -87,7 +126,6 @@ func NewBackendServerlessStack(scope constructs.Construct, id string, props *Bac
 		jsii.String("custom-authorizer"),
 		&awsapigatewayv2.HttpAuthorizerProps{
 				HttpApi: api,
-				IdentitySource: &identitySources,
 				Type: awsapigatewayv2.HttpAuthorizerType_LAMBDA,
 				AuthorizerUri: &authorizerUri,
 		})
@@ -161,9 +199,6 @@ func NewBackendServerlessStack(scope constructs.Construct, id string, props *Bac
 			},
 		}),
 	)
-
-	ddbTableInPolicy := aws.StringSlice([]string{*ddbTable.TableArn()})
-	fmt.Println("DynamoDB resource:", ddbTableInPolicy)
 
 	statements = append(statements,
 		awsiam.NewPolicyStatement(&awsiam.PolicyStatementProps{

@@ -12,6 +12,6 @@ func getIdentityProvider(u *User) (i IdentityProvider, e error) {
 	case Spotify:
 		return SpotifyIdentityProvider{}, nil
 	default:
-		return nil, fmt.Errorf("Could not find Ideneity Provider with name: %v", u.IDProvider)
+		return nil, fmt.Errorf("Could not find Identity Provider with name: %v", u.IDProvider)
 	}
 }

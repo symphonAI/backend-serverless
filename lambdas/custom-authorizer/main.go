@@ -15,8 +15,6 @@ func authorize(ctx context.Context, event events.APIGatewayCustomAuthorizerReque
 
 	cookieStr := event.Headers["cookie"]
 
-	fmt.Println("Cookie string:", cookieStr)
-
 	tokenString := extractJwtFromCookie(cookieStr)
 
 	if tokenString == nil {

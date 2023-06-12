@@ -11,12 +11,12 @@ import (
 )
 
 func authorize(ctx context.Context, event events.APIGatewayCustomAuthorizerRequest) (events.APIGatewayCustomAuthorizerResponse, error) {
-	fmt.Println("Custom authorizer called:")
+	fmt.Println("Custom authorizer called:", event)
 
 	cookieStr := event.AuthorizationToken
 
 	fmt.Println("Cookie string:", cookieStr)
-	
+
 	tokenString := extractJwtFromCookie(cookieStr)
 
 	if tokenString == nil {

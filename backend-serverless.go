@@ -117,6 +117,7 @@ func NewBackendServerlessStack(scope constructs.Construct, id string, props *Bac
 		Entry:       jsii.String("./lambdas/custom-authorizer"),
 		Environment: &customAuthorizerEnvVars,
 		Runtime: awslambda.Runtime_GO_1_X(),
+		Role: customAuthorizerRole,
 	})
 
 	str := "$request.header.cookie"

@@ -10,10 +10,10 @@ import (
 	"github.com/aws/aws-lambda-go/lambda"
 )
 
-func authorize(ctx context.Context, event events.APIGatewayCustomAuthorizerRequest) (events.APIGatewayCustomAuthorizerResponse, error) {
+func authorize(ctx context.Context, event events.APIGatewayCustomAuthorizerRequestTypeRequest) (events.APIGatewayCustomAuthorizerResponse, error) {
 	fmt.Println("Custom authorizer called:", event)
 
-	cookieStr := event.AuthorizationToken
+	cookieStr := event.Headers["cookie"]
 
 	fmt.Println("Cookie string:", cookieStr)
 

@@ -83,6 +83,7 @@ func handlePrompt(ctx context.Context, request events.APIGatewayProxyRequest) (e
         HttpOnly: true,
 		SameSite: http.SameSiteNoneMode,
         Secure:   true,
+		Domain: request.RequestContext.DomainName,
     }
 	headers := make(map[string]string)
     headers["Set-Cookie"] = cookie.String()

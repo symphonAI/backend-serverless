@@ -13,11 +13,12 @@ import (
 
 func testAuth(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	fmt.Println("Test auth:", request.RequestContext.Authorizer)
-	accessToken := request.RequestContext.Authorizer["spotifyAccessToken"]
+	accessToken := request.RequestContext.Authorizer["lambda"].(map[string]interface{})["accessToken"].(string)
 
+	fmt.Println("Access token:", accessToken)
 	response := events.APIGatewayProxyResponse{
 		StatusCode: http.StatusOK,
-		Body: accessToken.(string),
+		Body: accessToken,
 	}
 	return response, nil
 }

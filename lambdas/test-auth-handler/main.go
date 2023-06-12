@@ -3,6 +3,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 
 	"github.com/aws/aws-lambda-go/events"
@@ -10,8 +11,9 @@ import (
 )
 
 
-func handlePrompt(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	accessToken := ctx.Value("spotifyAccessToken")
+func testAuth(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+	fmt.Println("Test auth:", request.RequestContext.Authorizer)
+	accessToken := request.RequestContext.Authorizer["spotifyAccessToken"]
 
 	response := events.APIGatewayProxyResponse{
 		StatusCode: http.StatusOK,
@@ -22,5 +24,5 @@ func handlePrompt(ctx context.Context, request events.APIGatewayProxyRequest) (e
 
 func main() {
 	// Make the handler available for Remote Procedure Call by AWS Lambda
-	lambda.Start(handlePrompt)
+	lambda.Start(testAuth)
 }

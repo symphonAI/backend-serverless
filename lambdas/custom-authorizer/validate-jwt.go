@@ -10,6 +10,8 @@ import (
 func validateJWT(tokenString string) (jwt.MapClaims, error) {
 	issuerID := os.Getenv("ISSUER_ID")
 
+	fmt.Println("Token string:", tokenString)
+
 	// Parse the token
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		// Verify the signing method and return the secret key

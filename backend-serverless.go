@@ -76,7 +76,6 @@ func NewBackendServerlessStack(scope constructs.Construct, id string, props *Bac
 		Runtime: awslambda.Runtime_GO_1_X(),
 	})
 
-	customAuthorizerFunc.GrantInvoke(api)
 	str := "$request.header.cookie"
 	identitySources := []*string{}
 	identitySources = append(identitySources, &str)

@@ -34,7 +34,7 @@ func saveUserAndRefreshTokenToDb(userId string, email string, refreshToken strin
 		UpdatedOn: currentDateTime,
 	}
 	
-	ddbitem, err := attributevalue.Unm(user)
+	ddbitem, err := attributevalue.MarshalMap(user)
 	if err != nil {
 		return fmt.Errorf("failed to marshal User: %w", err)
 	}

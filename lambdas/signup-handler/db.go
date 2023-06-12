@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
@@ -21,14 +22,19 @@ func saveUserAndRefreshTokenToDb(userId string, email string, refreshToken strin
 
 	ddb := dynamodb.NewFromConfig(cfg)
 
+	currentDateTime := time.Now().Unix()
+
 	user := User{
 		PartitionKey: "USER",
 		SortKey: email,
 		RefreshToken: refreshToken,
 		Username: userId,
+		IDProvider: Spotify,
+		CreatedOn: currentDateTime,
+		UpdatedOn: currentDateTime,
 	}
 	
-	ddbitem, err := attributevalue.MarshalMap(user)
+	ddbitem, err := attributevalue.Unm(user)
 	if err != nil {
 		return fmt.Errorf("failed to marshal User: %w", err)
 	}

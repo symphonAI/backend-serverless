@@ -10,6 +10,7 @@ type User struct {
 	CreatedOn int64
 }
 
+
 type IDProvider string
 
 const (

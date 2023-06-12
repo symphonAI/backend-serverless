@@ -27,14 +27,28 @@ func authorize(ctx context.Context, event events.APIGatewayCustomAuthorizerReque
 		return events.APIGatewayCustomAuthorizerResponse{}, errors.New("Unauthorized") // Return a 401 Unauthorized response
 	}
 
+	user, err := getUserFromDB(jwtClaims["user"].(string))
+	if err != nil {
+		return events.APIGatewayCustomAuthorizerResponse{}, errors.New("Unauthorized")
+	}
+
+	ip, err := getIdentityProvider(user)
+	if err != nil {
+		return events.APIGatewayCustomAuthorizerResponse{}, errors.New("Unauthorized")
+	}
+	accessCredentials, err := ip.getAccessCredentials(user)
+	if err != nil {
+		return events.APIGatewayCustomAuthorizerResponse{}, errors.New("Unauthorized")
+	}
 	// Generate the policy document for the user
 	// TODO I think there will be some BS here to deal with
 	policyDocument := generatePolicy(event.MethodArn)
 
 	// Generate the authorizer response
 	response := events.APIGatewayCustomAuthorizerResponse{
-		PrincipalID:  jwtClaims["user"].(string),
+		PrincipalID:  user.SortKey,
 		PolicyDocument: policyDocument,
+		Context: accessCredentials,
 	}
 
 	return response, nil

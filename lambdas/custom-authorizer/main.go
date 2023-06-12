@@ -10,7 +10,7 @@ import (
 	"github.com/aws/aws-lambda-go/lambda"
 )
 
-func authorize(ctx context.Context, event events.APIGatewayCustomAuthorizerRequestTypeRequest) (events.APIGatewayCustomAuthorizerResponse, error) {
+func authorize(ctx context.Context, event events.APIGatewayV2CustomAuthorizerV2Request) (events.APIGatewayCustomAuthorizerResponse, error) {
 	fmt.Println("Custom authorizer called:", event)
 
 	cookieStr := event.Headers["cookie"]
@@ -42,7 +42,7 @@ func authorize(ctx context.Context, event events.APIGatewayCustomAuthorizerReque
 	}
 	// Generate the policy document for the user
 	// TODO I think there will be some BS here to deal with
-	policyDocument := generatePolicy(event.MethodArn)
+	policyDocument := generatePolicy(event.RouteArn)
 
 	// Generate the authorizer response
 	response := events.APIGatewayCustomAuthorizerResponse{

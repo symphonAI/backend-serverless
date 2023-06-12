@@ -14,6 +14,7 @@ import (
 type SpotifyIdentityProvider struct {}
 
 func (su SpotifyIdentityProvider) getAccessCredentials(u *User) (a AccessCredentials, e error){
+	fmt.Println("Fetching Spotify API Access credentials...")
 	accessToken, err := exchangeRefreshTokenForAuthToken(u.RefreshToken)
 	if err != nil {
 		return nil, err

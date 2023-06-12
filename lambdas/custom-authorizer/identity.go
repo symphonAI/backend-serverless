@@ -8,6 +8,7 @@ type IdentityProvider interface {
 
 
 func getIdentityProvider(u *User) (i IdentityProvider, e error) {
+	fmt.Println("Fetching identity provider based on user...")
 	switch (u.IDProvider){
 	case Spotify:
 		return SpotifyIdentityProvider{}, nil

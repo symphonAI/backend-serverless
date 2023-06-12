@@ -52,6 +52,7 @@ func getUserFromDB(us string) (user *User, err error){
 }
 
 func mapDynamoDbItemToUser(m map[string]types.AttributeValue) (u *User, err error){
+	u = &User{}
 	e := attributevalue.UnmarshalMap(m, u)
 	if e != nil {
 		return nil, e

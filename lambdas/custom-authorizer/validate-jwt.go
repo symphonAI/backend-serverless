@@ -16,15 +16,18 @@ func validateJWT(tokenString string) (jwt.MapClaims, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
+		
 		return []byte(issuerID), nil
 	})
 
 	if err != nil {
+		fmt.Println("Error while parsing token:", err)
 		return nil, err
 	}
 
 	// Check if the token is valid
 	if !token.Valid {
+		fmt.Println("Token validity is false")
 		return nil, fmt.Errorf("invalid token")
 	}
 

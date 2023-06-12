@@ -11,7 +11,7 @@ import (
 )
 
 func authorize(ctx context.Context, event events.APIGatewayCustomAuthorizerRequest) (events.APIGatewayCustomAuthorizerResponse, error) {
-	fmt.Println("Custom authorizer called:", event)
+	fmt.Println("Custom authorizer called:")
 
 	cookieStr := event.AuthorizationToken
 

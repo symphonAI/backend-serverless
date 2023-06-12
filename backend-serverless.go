@@ -271,6 +271,33 @@ func NewBackendServerlessStack(scope constructs.Construct, id string, props *Bac
 			}),
 	})
 
+	// Logout Handler
+	logoutFunc := awslambdago.NewGoFunction(stack, jsii.String("logout-handler"), &awslambdago.GoFunctionProps{
+		MemorySize:  jsii.Number(128),
+		ModuleDir:   jsii.String("./go.mod"),
+		Entry:       jsii.String("./lambdas/logout-handler"),
+		Environment: &signupLambdaEnvVars,
+		Runtime: awslambda.Runtime_GO_1_X(),
+	})
+	
+	logoutIntegration := awsapigatewayv2integrations.NewHttpLambdaIntegration(
+		jsii.String("LogoutIntegration"),
+		logoutFunc,
+		&awsapigatewayv2integrations.HttpLambdaIntegrationProps{})
+	
+	api.AddRoutes(&awsapigatewayv2.AddRoutesOptions{
+		Integration: logoutIntegration,
+		Path:        jsii.String("/logout"),
+		Methods: &[]awsapigatewayv2.HttpMethod{awsapigatewayv2.HttpMethod_GET},
+		Authorizer: awsapigatewayv2.HttpAuthorizer_FromHttpAuthorizerAttributes(
+			stack, 
+			jsii.String("custom-auth-for-logout"), 
+			&awsapigatewayv2.HttpAuthorizerAttributes{
+				AuthorizerId: authorizer.AuthorizerId(),
+				AuthorizerType: jsii.String("CUSTOM"),
+			}),
+	})
+
 	return stack
 }
 

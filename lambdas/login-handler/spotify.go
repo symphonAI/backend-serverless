@@ -63,7 +63,7 @@ func exchangeCodeForAuthTokens(code string) (string, string, error) {
 }
 
 func getUserIdentifiers(accessToken string) (string, string, error){
-	fmt.Println("Getting user data from spotify...")
+	fmt.Println("Getting user data from spotify...", accessToken)
 
 	url := "https://api.spotify.com/v1/me"
 	req, err := http.NewRequest("GET", url, nil)

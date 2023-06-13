@@ -41,7 +41,7 @@ func handlePrompt(ctx context.Context, request events.APIGatewayProxyRequest) (e
 		}
 		return response, errors.New(errorString) // TODO should return error instead?
 	}
-	fmt.Println("Successfully generated refresh token and access token.")
+	fmt.Println("Successfully generated refresh token and access token:", access_token)
 
 	// Get User Email
 	id, email, err := getUserIdentifiers(access_token)

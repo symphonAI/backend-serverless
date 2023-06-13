@@ -18,6 +18,7 @@ func getUserFromDB(us string) (user *User, err error){
     if err != nil {
         log.Fatalf("unable to load SDK config, %v", err)
     }
+	fmt.Println("User email:", us)
 
 	ddb := dynamodb.NewFromConfig(cfg)
 	ddbTableName := os.Getenv("DYNAMODB_TABLE_NAME")

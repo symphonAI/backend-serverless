@@ -172,19 +172,19 @@ func NewBackendServerlessStack(scope constructs.Construct, id string, props *Bac
 		Methods: &[]awsapigatewayv2.HttpMethod{awsapigatewayv2.HttpMethod_POST},
 	})
 
-	// Signup lambda function
+	// Login lambda function
 
 	// First, initialise the environment variables
 	// that will go into the lambda function
-	signupLambdaEnvVars := make(map[string]*string)
+	loginLambdaEnvVars := make(map[string]*string)
 
 	// Assign the values to the map
-	signupLambdaEnvVars["DYNAMODB_TABLE_NAME"] = ddbTable.TableName()
+	loginLambdaEnvVars["DYNAMODB_TABLE_NAME"] = ddbTable.TableName()
 
-	addSecretCredentialsToEnvVars(signupLambdaEnvVars)
+	addSecretCredentialsToEnvVars(loginLambdaEnvVars)
 
 	// The role is gonna be a bit of a pain...
-	signupRole := awsiam.NewRole(stack, jsii.String("signup-lambda-role"), &awsiam.RoleProps{
+	loginRole := awsiam.NewRole(stack, jsii.String("login-lambda-role"), &awsiam.RoleProps{
 		AssumedBy: awsiam.NewServicePrincipal(jsii.String("lambda.amazonaws.com"), &awsiam.ServicePrincipalOpts{
 			Region: jsii.String("ap-southeast-2"),
 		}),
@@ -214,33 +214,33 @@ func NewBackendServerlessStack(scope constructs.Construct, id string, props *Bac
 		}),
 	)
 
-	signupRoleInPolicy := []awsiam.IRole{signupRole}
-	fmt.Println("SignupRole resource:", signupRoleInPolicy)
+	loginRoleInPolicy := []awsiam.IRole{loginRole}
+	fmt.Println("loginRole resource:", loginRoleInPolicy)
 
 	// Create the policy and add the statements and add the role
-	awsiam.NewPolicy(stack, jsii.String("signup-role-policy"), &awsiam.PolicyProps{
-		PolicyName: aws.String("signup-role-policy"),
+	awsiam.NewPolicy(stack, jsii.String("login-role-policy"), &awsiam.PolicyProps{
+		PolicyName: aws.String("login-role-policy"),
 		Statements: &statements,
-		Roles:      &signupRoleInPolicy,
+		Roles:      &loginRoleInPolicy,
 	})
 
-	signupFunc := awslambdago.NewGoFunction(stack, jsii.String("signup-handler"), &awslambdago.GoFunctionProps{
+	loginFunc := awslambdago.NewGoFunction(stack, jsii.String("login-handler"), &awslambdago.GoFunctionProps{
 		MemorySize:  jsii.Number(128),
 		ModuleDir:   jsii.String("./go.mod"),
-		Entry:       jsii.String("./lambdas/signup-handler"),
-		Environment: &signupLambdaEnvVars,
-		Role:        signupRole,
+		Entry:       jsii.String("./lambdas/login-handler"),
+		Environment: &loginLambdaEnvVars,
+		Role:        loginRole,
 		Runtime: awslambda.Runtime_GO_1_X(),
 	})
 
-	signupIntegration := awsapigatewayv2integrations.NewHttpLambdaIntegration(
-		jsii.String("SignupIntegration"),
-		signupFunc,
+	loginIntegration := awsapigatewayv2integrations.NewHttpLambdaIntegration(
+		jsii.String("loginIntegration"),
+		loginFunc,
 		&awsapigatewayv2integrations.HttpLambdaIntegrationProps{})
 
 	api.AddRoutes(&awsapigatewayv2.AddRoutesOptions{
-		Integration: signupIntegration,
-		Path:        jsii.String("/signup"),
+		Integration: loginIntegration,
+		Path:        jsii.String("/login"),
 		Methods: &[]awsapigatewayv2.HttpMethod{awsapigatewayv2.HttpMethod_POST},
 	})
 
@@ -249,12 +249,12 @@ func NewBackendServerlessStack(scope constructs.Construct, id string, props *Bac
 		MemorySize:  jsii.Number(128),
 		ModuleDir:   jsii.String("./go.mod"),
 		Entry:       jsii.String("./lambdas/test-auth-handler"),
-		Environment: &signupLambdaEnvVars,
+		Environment: &loginLambdaEnvVars,
 		Runtime: awslambda.Runtime_GO_1_X(),
 	})
 
 	testAuthIntegration := awsapigatewayv2integrations.NewHttpLambdaIntegration(
-		jsii.String("SignupIntegration"),
+		jsii.String("loginIntegration"),
 		testAuthFunc,
 		&awsapigatewayv2integrations.HttpLambdaIntegrationProps{})
 
@@ -276,7 +276,7 @@ func NewBackendServerlessStack(scope constructs.Construct, id string, props *Bac
 		MemorySize:  jsii.Number(128),
 		ModuleDir:   jsii.String("./go.mod"),
 		Entry:       jsii.String("./lambdas/logout-handler"),
-		Environment: &signupLambdaEnvVars,
+		Environment: &loginLambdaEnvVars,
 		Runtime: awslambda.Runtime_GO_1_X(),
 	})
 	

@@ -17,7 +17,7 @@ import (
 
 func handlePrompt(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error)  {
 	// Retrieve the request body from the event
-	requestBody := SignupRequestBody{}
+	requestBody := LoginRequestBody{}
 	err := json.Unmarshal([]byte(request.Body), &requestBody)
 	if err != nil {
 		errorString := fmt.Sprintf("unable to unmarshal request body: %s", err.Error())

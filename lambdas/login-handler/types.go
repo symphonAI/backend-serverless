@@ -1,6 +1,6 @@
 package main
 
-type SignupRequestBody struct {
+type LoginRequestBody struct {
 	Code string `json:"code"`
 }
 

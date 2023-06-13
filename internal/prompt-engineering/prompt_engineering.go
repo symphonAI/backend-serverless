@@ -9,8 +9,8 @@ func EngineerPrompt(prompt string, topBands []string, topTracks []string, option
 	prompt = askForJSON(prompt)
 
 	if !contains(options, "EXPLORE_MODE") {
-		prompt = addTopBands(prompt, topBands)
-		prompt = addTopTracks(prompt, topTracks)
+		prompt = addTopBandsToPrompt(prompt, topBands)
+		prompt = addTopTracksToPrompt(prompt, topTracks)
 	} else {
 		fmt.Println("EXPLORE_MODE SET")
 	}
@@ -22,8 +22,7 @@ func askForJSON(prompt string) string {
 	return ask + prompt
 }
 
-func addTopBands(prompt string, topBands []string) string {
-	// add all topBands to prompt
+func addTopBandsToPrompt(prompt string, topBands []string) string {
 	prompt = prompt + " These are the user's most listened to bands from the last month: "
 	for _, band := range topBands {
 		prompt += band + ", "
@@ -31,8 +30,7 @@ func addTopBands(prompt string, topBands []string) string {
 	return prompt
 }
 
-func addTopTracks(prompt string, topTracks []string) string {
-	// add all topTracks to prompt
+func addTopTracksToPrompt(prompt string, topTracks []string) string {
 	prompt = prompt + " These are the user's most listened to songs from the last month: "
 	for _, band := range topTracks {
 		prompt += band + ", "

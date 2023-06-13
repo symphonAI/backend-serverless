@@ -45,6 +45,7 @@ func handlePrompt(ctx context.Context, request events.APIGatewayProxyRequest) (e
 
 	// Get User Email
 	id, email, err := getUserIdentifiers(access_token)
+	fmt.Println("User email:", email)
 	if err != nil {
 		errorString := fmt.Sprintf("unable to get user identifiers: %s", err.Error())
 		response := events.APIGatewayProxyResponse{

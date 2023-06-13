@@ -9,7 +9,7 @@ import (
 )
 
 func GenerateJWT(region, email string) (string, error) {
-    fmt.Println("Generating JWT...")
+    fmt.Println("Generating JWT...", email)
 
 	issuer_id := os.Getenv("ISSUER_ID")
 	aud_id := os.Getenv("AUDIENCE_ID")

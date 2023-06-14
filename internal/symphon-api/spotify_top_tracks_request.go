@@ -1,7 +1,6 @@
 package symphonapi
 
 import (
-	"context"
 	"encoding/json"
 	"io/ioutil"
 	"net/http"

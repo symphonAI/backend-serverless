@@ -11,13 +11,10 @@ import (
 	"os"
 )
 
-func exchangeCodeForAuthTokens(code string) (string, string, error) {
+func exchangeCodeForAuthTokens(code string, redirectURI string) (string, string, error) {
 	clientID := os.Getenv("SPOTIFY_CLIENT_ID")
 	clientSecret := os.Getenv("SPOTIFY_CLIENT_SECRET")
-	redirectURI := os.Getenv("SPOTIFY_REDIRECT_URI")
 
-	fmt.Println("Client ID:", clientID)
-	fmt.Println("Client Secret:", clientSecret)
 	fmt.Println("Redirect URI:", redirectURI)
 
 	authURL := "https://accounts.spotify.com/api/token"

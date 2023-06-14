@@ -29,10 +29,9 @@ func handlePrompt(ctx context.Context, request events.APIGatewayProxyRequest) (e
 	}
 
 	code := requestBody.Code
+	redirectURI := requestBody.RedirectURI
 
-	fmt.Println("Received auth code:", code)
-
-	refresh_token, access_token, err := exchangeCodeForAuthTokens(code)
+	refresh_token, access_token, err := exchangeCodeForAuthTokens(code, redirectURI)
 	if err != nil {
 		errorString := fmt.Sprintf("unable to exchange auth code with refresh token: %s", err.Error())
 		response := events.APIGatewayProxyResponse{

@@ -1,13 +1,12 @@
 package symphonapi
 
 import (
-	"context"
 	"io/ioutil"
 	"net/http"
 	"encoding/json"
 )
 
-func (c *Client) GetTopBandsSpotify(ctx context.Context, bandChannel chan SpotifyResult) {
+func (c *Client) GetTopBandsSpotify(spotifyAccessToken string, bandChannel chan SpotifyResult) {
 
 	endpoint := SPOTIFY_BASE_URL + "/me/top/artists?limit=25&time_range=long_term"
 
@@ -20,7 +19,6 @@ func (c *Client) GetTopBandsSpotify(ctx context.Context, bandChannel chan Spotif
 		return
 	}
 
-	spotifyAccessToken := ctx.Value("spotify_access_token").(string)
 	req.Header.Add("Authorization", "Bearer "+spotifyAccessToken)
 
 	resp, err := c.httpClient.Do(req)

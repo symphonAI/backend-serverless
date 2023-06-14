@@ -44,12 +44,14 @@ func handlePrompt(ctx context.Context, request events.APIGatewayProxyRequest) (e
 	fmt.Println("Received temperature:", temperature)
 	fmt.Println("Received options:", options)
 
+	spotifyAccessToken := ctx.Value("spotify_access_token").(string)
+
 	// get top bands and tracks concurrently
 	bandChannel := make(chan symphonapi.SpotifyResult)
 	trackChannel := make(chan symphonapi.SpotifyResult)
 
-	go cfg.symphonapiClient.GetTopBandsSpotify(ctx, bandChannel)
-	go cfg.symphonapiClient.GetTopTracksSpotify(ctx, trackChannel)
+	go cfg.symphonapiClient.GetTopBandsSpotify(spotifyAccessToken, bandChannel)
+	go cfg.symphonapiClient.GetTopTracksSpotify(spotifyAccessToken, trackChannel)
 
 	topBands := <-bandChannel
 	topTracks := <-trackChannel

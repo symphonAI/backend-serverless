@@ -7,7 +7,7 @@ import (
 	"net/http"
 )
 
-func (c *Client) GetTopTracksSpotify(ctx context.Context, trackChannel chan SpotifyResult) {
+func (c *Client) GetTopTracksSpotify(spotifyAccessToken string, trackChannel chan SpotifyResult) {
 
 	endpoint := SPOTIFY_BASE_URL + "/me/top/tracks?limit=25&time_range=long_term"
 
@@ -20,7 +20,6 @@ func (c *Client) GetTopTracksSpotify(ctx context.Context, trackChannel chan Spot
 		return
 	}
 
-	spotifyAccessToken := ctx.Value("spotify_access_token").(string)
 	req.Header.Add("Authorization", "Bearer "+spotifyAccessToken)
 
 	resp, err := c.httpClient.Do(req)

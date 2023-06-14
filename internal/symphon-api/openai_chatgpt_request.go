@@ -10,7 +10,7 @@ import (
 )
 
 func (c *Client) PromptChatGPT(userFields UserFields) (string, error) {
-	endpoint := BaseURL + "/completions"
+	endpoint := OPENAI_BASE_URL + "/completions"
 
 	fmt.Println("User fields:", userFields)
 	fmt.Println("Endpoint:", endpoint)

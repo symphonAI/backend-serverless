@@ -152,6 +152,7 @@ func NewBackendServerlessStack(scope constructs.Construct, id string, props *Bac
 		Environment: &promptLambdaEnvVars,
 		Timeout:  awscdk.Duration_Minutes(&durationInMinutes),
 		Runtime: awslambda.Runtime_GO_1_X(),
+		
 	})
 
 	promptIntegration := awsapigatewayv2integrations.NewHttpLambdaIntegration(
@@ -162,13 +163,13 @@ func NewBackendServerlessStack(scope constructs.Construct, id string, props *Bac
 	api.AddRoutes(&awsapigatewayv2.AddRoutesOptions{
 		Integration: promptIntegration,
 		Path:        jsii.String("/prompt"),
-		// Authorizer: awsapigatewayv2.HttpAuthorizer_FromHttpAuthorizerAttributes(
-		// 	stack, 
-		// 	jsii.String("custom-auth-for-prompt"), 
-		// 	&awsapigatewayv2.HttpAuthorizerAttributes{
-		// 		AuthorizerId: authorizer.AuthorizerId(),
-		// 		AuthorizerType: jsii.String("CUSTOM"),
-		// 	}),
+		Authorizer: awsapigatewayv2.HttpAuthorizer_FromHttpAuthorizerAttributes(
+			stack, 
+			jsii.String("custom-auth-for-prompt"), 
+			&awsapigatewayv2.HttpAuthorizerAttributes{
+				AuthorizerId: authorizer.AuthorizerId(),
+				AuthorizerType: jsii.String("CUSTOM"),
+			}),
 		Methods: &[]awsapigatewayv2.HttpMethod{awsapigatewayv2.HttpMethod_POST},
 	})
 

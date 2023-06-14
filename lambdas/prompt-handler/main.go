@@ -20,7 +20,7 @@ type config struct {
 }
 
 func handlePrompt(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	fmt.Println("Prompt called")
+	fmt.Println("/prompt called")
 	cfg := config{
 		symphonapiClient: symphonapi.NewClient(),
 	}
@@ -64,6 +64,9 @@ func handlePrompt(ctx context.Context, request events.APIGatewayProxyRequest) (e
 			StatusCode: http.StatusInternalServerError,
 		}, err
 	}
+
+	fmt.Println("Top Bands:", topBands)
+	fmt.Println("Top Tracks:", topTracks)
 
 	// engineer prompt
 	engineeredPrompt, err := promptengineering.EngineerPrompt(

@@ -7,13 +7,13 @@ import (
 	"net/http"
 )
 
-func (c *Client) GetTopTracksSpotify(ctx context.Context, bandChannel chan SpotifyResult) {
+func (c *Client) GetTopTracksSpotify(ctx context.Context, trackChannel chan SpotifyResult) {
 
 	endpoint := SPOTIFY_BASE_URL + "/me/top/tracks?limit=25&time_range=long_term"
 
 	req, err := http.NewRequest("GET", endpoint, nil)
 	if err != nil {
-		bandChannel <- SpotifyResult{
+		trackChannel <- SpotifyResult{
 			Message: nil,
 			Error:   err,
 		}
@@ -25,7 +25,7 @@ func (c *Client) GetTopTracksSpotify(ctx context.Context, bandChannel chan Spoti
 
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
-		bandChannel <- SpotifyResult{
+		trackChannel <- SpotifyResult{
 			Message: nil,
 			Error:   err,
 		}
@@ -35,7 +35,7 @@ func (c *Client) GetTopTracksSpotify(ctx context.Context, bandChannel chan Spoti
 	defer resp.Body.Close()
 	responseBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		bandChannel <- SpotifyResult{
+		trackChannel <- SpotifyResult{
 			Message: nil,
 			Error:   err,
 		}
@@ -45,7 +45,7 @@ func (c *Client) GetTopTracksSpotify(ctx context.Context, bandChannel chan Spoti
 	spotifyResponse := SpotifyTrackResponse{}
 	err = json.Unmarshal(responseBody, &spotifyResponse)
 	if err != nil {
-		bandChannel <- SpotifyResult{
+		trackChannel <- SpotifyResult{
 			Message: nil,
 			Error:   err,
 		}
@@ -59,7 +59,7 @@ func (c *Client) GetTopTracksSpotify(ctx context.Context, bandChannel chan Spoti
 		topTracks = append(topTracks, trackName+" - "+artist)
 	}
 
-	bandChannel <- SpotifyResult{
+	trackChannel <- SpotifyResult{
 		Message: topTracks,
 		Error:   nil,
 	}

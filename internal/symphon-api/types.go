@@ -21,6 +21,12 @@ type SpotifyTrackResponse struct {
 	} `json:"items"`
 }
 
+type SpotifyBandResult struct {
+	Items []struct {
+		Name       string `json:"name"`
+	} `json:"items"`
+}
+
 type SpotifyResult struct {
 	Message []string
 	Error   error

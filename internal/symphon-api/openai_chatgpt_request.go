@@ -3,7 +3,6 @@ package symphonapi
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -11,9 +10,6 @@ import (
 
 func (c *Client) PromptChatGPT(userFields UserFields) (string, error) {
 	endpoint := OPENAI_BASE_URL + "/completions"
-
-	fmt.Println("User fields:", userFields)
-	fmt.Println("Endpoint:", endpoint)
 
 	floatTemperature, err := strconv.ParseFloat(userFields.Temperature, 64)
 	if err != nil {

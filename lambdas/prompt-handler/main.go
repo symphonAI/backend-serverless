@@ -20,7 +20,7 @@ type config struct {
 }
 
 func handlePrompt(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	fmt.Println("Prompt called")
+	fmt.Println("/prompt called")
 	cfg := config{
 		symphonapiClient: symphonapi.NewClient(),
 	}
@@ -48,8 +48,8 @@ func handlePrompt(ctx context.Context, request events.APIGatewayProxyRequest) (e
 	bandChannel := make(chan symphonapi.SpotifyResult)
 	trackChannel := make(chan symphonapi.SpotifyResult)
 
-	go cfg.symphonapiClient.GetTopBandsSpotify(bandChannel)
-	go cfg.symphonapiClient.GetTopTracksSpotify(trackChannel)
+	go cfg.symphonapiClient.GetTopBandsSpotify(ctx, bandChannel)
+	go cfg.symphonapiClient.GetTopTracksSpotify(ctx, trackChannel)
 
 	topBands := <-bandChannel
 	topTracks := <-trackChannel
@@ -64,6 +64,9 @@ func handlePrompt(ctx context.Context, request events.APIGatewayProxyRequest) (e
 			StatusCode: http.StatusInternalServerError,
 		}, err
 	}
+
+	fmt.Println("Top Bands:", topBands)
+	fmt.Println("Top Tracks:", topTracks)
 
 	// engineer prompt
 	engineeredPrompt, err := promptengineering.EngineerPrompt(

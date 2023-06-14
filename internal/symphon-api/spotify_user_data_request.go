@@ -15,9 +15,8 @@ func (c *Client) GetUserDataFromSpotify(ctx context.Context) (SpotifyUserData, e
 		return SpotifyUserData{}, err
 	}
 
-	spotifyAccessToken := ctx.Value("spotify_access_token")
-
-	req.Header.Add("Authorization", "Bearer "+spotifyAccessToken.(string))
+	spotifyAccessToken := ctx.Value("spotify_access_token").(string)
+	req.Header.Add("Authorization", "Bearer "+spotifyAccessToken)
 
 	resp, err := c.httpClient.Do(req)
 	if err != nil {

@@ -48,8 +48,8 @@ func handlePrompt(ctx context.Context, request events.APIGatewayProxyRequest) (e
 	bandChannel := make(chan symphonapi.SpotifyResult)
 	trackChannel := make(chan symphonapi.SpotifyResult)
 
-	go cfg.symphonapiClient.GetTopBandsSpotify(bandChannel)
-	go cfg.symphonapiClient.GetTopTracksSpotify(trackChannel)
+	go cfg.symphonapiClient.GetTopBandsSpotify(ctx, bandChannel)
+	go cfg.symphonapiClient.GetTopTracksSpotify(ctx, trackChannel)
 
 	topBands := <-bandChannel
 	topTracks := <-trackChannel

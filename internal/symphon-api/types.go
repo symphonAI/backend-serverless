@@ -12,10 +12,20 @@ type ChatGPTResponse struct {
 	} `json:"choices"`
 }
 
+type SpotifyTrackResponse struct {
+	Items []struct {
+		Artists []struct {
+			Name string `json:"name"`
+		} `json:"artists"`
+		Name        string `json:"name"`
+	} `json:"items"`
+}
+
 type SpotifyResult struct {
 	Message []string
 	Error   error
 }
+
 
 type SpotifyUserData struct {
 	DisplayName string `json:"display_name"`
@@ -23,4 +33,3 @@ type SpotifyUserData struct {
 	Email       string `json:"email"`
 	ImageURL    string `json:"image_url"`
 }
-

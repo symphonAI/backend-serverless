@@ -12,7 +12,6 @@ func (c *Client) getSpotifyTrackID(spotifyAccessToken string, trackName string, 
 	query := "/search?q=track:" + url.QueryEscape(trackName) + "%20artist:" + url.QueryEscape(artistName) + "&type=track&limit=1"
 	endpoint := SPOTIFY_BASE_URL + query
 
-	fmt.Println("Endpoint:", endpoint)
 	req, err := http.NewRequest("GET", endpoint, nil)
 	if err != nil {
 		trackIDChannel <- SpotifyTrackIDResult{Error: err}
@@ -66,8 +65,6 @@ func (c *Client) GetAllSpotifyTrackIDs(spotifyAccessToken string, chatGPTRecomme
 		}
 		trackIDs = append(trackIDs, trackIDResult.ID)
 	}
-
-	fmt.Println("Track IDs:", trackIDs)
 
 	return trackIDs, err
 }

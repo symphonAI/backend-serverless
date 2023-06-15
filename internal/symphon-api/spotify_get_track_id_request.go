@@ -18,6 +18,8 @@ func (c *Client) getSpotifyTrackID(wg *sync.WaitGroup, spotifyAccessToken string
 		return
 	}
 
+	fmt.Println("Endpoint:", endpoint)
+
 	req.Header.Add("Authorization", "Bearer "+spotifyAccessToken)
 
 	resp, err := c.httpClient.Do(req)

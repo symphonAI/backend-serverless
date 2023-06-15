@@ -4,9 +4,11 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
+	"sync"
 )
 
-func (c *Client) getSpotifyTrackID(spotifyAccessToken string, trackName string, artistName string, trackIDChannel chan SpotifyTrackIDResult) {
+func (c *Client) getSpotifyTrackID(wg sync.WaitGroup, spotifyAccessToken string, trackName string, artistName string, trackIDChannel chan SpotifyTrackIDResult) {
+	defer wg.Done()
 
 	endpoint := SPOTIFY_BASE_URL + "/search?q=track:" + trackName + "%20artist:" + artistName + "&type=track&limit=1"
 	req, err := http.NewRequest("GET", endpoint, nil)
@@ -42,6 +44,9 @@ func (c *Client) getSpotifyTrackID(spotifyAccessToken string, trackName string, 
 }
 
 func (c *Client) GetAllSpotifyTrackIDs(spotifyAccessToken string, chatGPTRecommendations ChatGPTRecommendations) ([]string, error) {
+	var wg sync.WaitGroup
+	wg.Add(len(chatGPTRecommendations))
+
 	trackIDChannel := make(chan SpotifyTrackIDResult)
 	defer close(trackIDChannel)
 
@@ -57,6 +62,8 @@ func (c *Client) GetAllSpotifyTrackIDs(spotifyAccessToken string, chatGPTRecomme
 		}
 		trackIDs = append(trackIDs, trackIDResult.ID)
 	}
+
+	wg.Wait()
 
 	return trackIDs, nil
 }

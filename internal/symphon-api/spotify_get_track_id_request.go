@@ -50,14 +50,13 @@ func (c *Client) GetAllSpotifyTrackIDs(spotifyAccessToken string, chatGPTRecomme
 		go c.getSpotifyTrackID(spotifyAccessToken, recommendation.Track, recommendation.Artist, trackIDChannel)
 	}
 
-	for i := 0; i < len(chatGPTRecommendations); i++ {
+	for range trackIDs {
 		trackIDResult := <-trackIDChannel
 		if trackIDResult.Error != nil {
 			return nil, trackIDResult.Error
 		}
 		trackIDs = append(trackIDs, trackIDResult.ID)
 	}
-
 
 	return trackIDs, nil
 }

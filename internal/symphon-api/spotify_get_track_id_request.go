@@ -61,7 +61,7 @@ func (c *Client) GetAllSpotifyTrackIDs(spotifyAccessToken string, chatGPTRecomme
 
 	wg.Wait()
 
-	for range trackIDs {
+	for range chatGPTRecommendations {
 		trackIDResult := <-trackIDChannel
 		if trackIDResult.Error != nil {
 			return nil, trackIDResult.Error

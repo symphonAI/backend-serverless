@@ -12,7 +12,7 @@ import (
 func (c *Client) getSpotifyTrackID(wg *sync.WaitGroup, spotifyAccessToken string, trackName string, artistName string, trackIDChannel chan SpotifyTrackIDResult) {
 	defer wg.Done()
 
-	query := url.QueryEscape("/search?q=track:" + trackName + "%20artist:" + artistName + "&type=track&limit=1")
+	query := "/search?q=track:" + url.QueryEscape(trackName) + "%20artist:" + url.QueryEscape(artistName) + "&type=track&limit=1"
 	endpoint := SPOTIFY_BASE_URL + query
 
 	fmt.Println("Endpoint:", endpoint)

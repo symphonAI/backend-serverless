@@ -5,20 +5,22 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"sync"
 )
 
 func (c *Client) getSpotifyTrackID(wg *sync.WaitGroup, spotifyAccessToken string, trackName string, artistName string, trackIDChannel chan SpotifyTrackIDResult) {
 	defer wg.Done()
 
-	endpoint := SPOTIFY_BASE_URL + "/search?q=track:" + trackName + "%20artist:" + artistName + "&type=track&limit=1"
+	query := url.QueryEscape("/search?q=track:" + trackName + "%20artist:" + artistName + "&type=track&limit=1")
+	endpoint := SPOTIFY_BASE_URL + query
+
+	fmt.Println("Endpoint:", endpoint)
 	req, err := http.NewRequest("GET", endpoint, nil)
 	if err != nil {
 		trackIDChannel <- SpotifyTrackIDResult{Error: err}
 		return
 	}
-
-	fmt.Println("Endpoint:", endpoint)
 
 	req.Header.Add("Authorization", "Bearer "+spotifyAccessToken)
 

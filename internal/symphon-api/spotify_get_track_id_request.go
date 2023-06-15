@@ -41,6 +41,8 @@ func (c *Client) getSpotifyTrackID(wg *sync.WaitGroup, spotifyAccessToken string
 		trackIDChannel <- SpotifyTrackIDResult{Error: err}
 		return
 	}
+
+	fmt.Println("Spotify response:", spotifyResponse)
 	trackID := spotifyResponse.Tracks.Items[0].ID
 	fmt.Println("Track ID:", trackID)
 

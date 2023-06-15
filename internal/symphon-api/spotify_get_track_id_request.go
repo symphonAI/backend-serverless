@@ -6,12 +6,9 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
-	"sync"
 )
 
-func (c *Client) getSpotifyTrackID(wg *sync.WaitGroup, spotifyAccessToken string, trackName string, artistName string, trackIDChannel chan SpotifyTrackIDResult) {
-	defer wg.Done()
-
+func (c *Client) getSpotifyTrackID(spotifyAccessToken string, trackName string, artistName string, trackIDChannel chan SpotifyTrackIDResult) {
 	query := "/search?q=track:" + url.QueryEscape(trackName) + "%20artist:" + url.QueryEscape(artistName) + "&type=track&limit=1"
 	endpoint := SPOTIFY_BASE_URL + query
 
@@ -43,8 +40,6 @@ func (c *Client) getSpotifyTrackID(wg *sync.WaitGroup, spotifyAccessToken string
 		trackIDChannel <- SpotifyTrackIDResult{Error: err}
 		return
 	}
-
-	fmt.Println("Spotify response:", spotifyResponse)
 	trackID := spotifyResponse.Tracks.Items[0].ID
 	fmt.Println("Track ID:", trackID)
 
@@ -52,19 +47,15 @@ func (c *Client) getSpotifyTrackID(wg *sync.WaitGroup, spotifyAccessToken string
 }
 
 func (c *Client) GetAllSpotifyTrackIDs(spotifyAccessToken string, chatGPTRecommendations ChatGPTRecommendations) ([]string, error) {
-	var wg sync.WaitGroup
-	wg.Add(len(chatGPTRecommendations))
 
-	trackIDChannel := make(chan SpotifyTrackIDResult)
+	trackIDChannel := make(chan SpotifyTrackIDResult, len(chatGPTRecommendations))
 	defer close(trackIDChannel)
 
-	trackIDs := []string{}
 	for _, recommendation := range chatGPTRecommendations {
-		go c.getSpotifyTrackID(&wg, spotifyAccessToken, recommendation.Track, recommendation.Artist, trackIDChannel)
+		go c.getSpotifyTrackID(spotifyAccessToken, recommendation.Track, recommendation.Artist, trackIDChannel)
 	}
 
-	wg.Wait()
-
+	trackIDs := []string{}
 	for range chatGPTRecommendations {
 		trackIDResult := <-trackIDChannel
 		if trackIDResult.Error != nil {
@@ -72,6 +63,8 @@ func (c *Client) GetAllSpotifyTrackIDs(spotifyAccessToken string, chatGPTRecomme
 		}
 		trackIDs = append(trackIDs, trackIDResult.ID)
 	}
+
+	fmt.Println("Track IDs:", trackIDs)
 
 	return trackIDs, nil
 }

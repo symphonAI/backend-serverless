@@ -7,7 +7,7 @@ import (
 	"sync"
 )
 
-func (c *Client) getSpotifyTrackID(wg sync.WaitGroup, spotifyAccessToken string, trackName string, artistName string, trackIDChannel chan SpotifyTrackIDResult) {
+func (c *Client) getSpotifyTrackID(wg *sync.WaitGroup, spotifyAccessToken string, trackName string, artistName string, trackIDChannel chan SpotifyTrackIDResult) {
 	defer wg.Done()
 
 	endpoint := SPOTIFY_BASE_URL + "/search?q=track:" + trackName + "%20artist:" + artistName + "&type=track&limit=1"
@@ -52,7 +52,7 @@ func (c *Client) GetAllSpotifyTrackIDs(spotifyAccessToken string, chatGPTRecomme
 
 	trackIDs := []string{}
 	for _, recommendation := range chatGPTRecommendations {
-		go c.getSpotifyTrackID(spotifyAccessToken, recommendation.Track, recommendation.Artist, trackIDChannel)
+		go c.getSpotifyTrackID(&wg, spotifyAccessToken, recommendation.Track, recommendation.Artist, trackIDChannel)
 	}
 
 	for range trackIDs {

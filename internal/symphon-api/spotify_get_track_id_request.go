@@ -2,6 +2,7 @@ package symphonapi
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"sync"
@@ -39,6 +40,7 @@ func (c *Client) getSpotifyTrackID(wg *sync.WaitGroup, spotifyAccessToken string
 		return
 	}
 	trackID := spotifyResponse.Tracks.Items[0].ID
+	fmt.Println("Track ID:", trackID)
 
 	trackIDChannel <- SpotifyTrackIDResult{ID: trackID}
 }
@@ -55,6 +57,8 @@ func (c *Client) GetAllSpotifyTrackIDs(spotifyAccessToken string, chatGPTRecomme
 		go c.getSpotifyTrackID(&wg, spotifyAccessToken, recommendation.Track, recommendation.Artist, trackIDChannel)
 	}
 
+	wg.Wait()
+
 	for range trackIDs {
 		trackIDResult := <-trackIDChannel
 		if trackIDResult.Error != nil {
@@ -62,8 +66,6 @@ func (c *Client) GetAllSpotifyTrackIDs(spotifyAccessToken string, chatGPTRecomme
 		}
 		trackIDs = append(trackIDs, trackIDResult.ID)
 	}
-
-	wg.Wait()
 
 	return trackIDs, nil
 }

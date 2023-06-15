@@ -56,15 +56,18 @@ func (c *Client) GetAllSpotifyTrackIDs(spotifyAccessToken string, chatGPTRecomme
 	}
 
 	trackIDs := []string{}
+	err := error(nil)
+
 	for range chatGPTRecommendations {
 		trackIDResult := <-trackIDChannel
 		if trackIDResult.Error != nil {
-			return nil, trackIDResult.Error
+			err = trackIDResult.Error
+			continue
 		}
 		trackIDs = append(trackIDs, trackIDResult.ID)
 	}
 
 	fmt.Println("Track IDs:", trackIDs)
 
-	return trackIDs, nil
+	return trackIDs, err
 }

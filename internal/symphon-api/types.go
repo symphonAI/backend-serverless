@@ -47,7 +47,7 @@ type ChatGPTRecommendations []struct {
 type SpotifyTrackIDResponse struct {
 	Tracks struct {
 		Items []struct {
-			ID          string `json:"id"`
+			ID string `json:"id"`
 		} `json:"items"`
 	} `json:"tracks"`
 }
@@ -55,4 +55,9 @@ type SpotifyTrackIDResponse struct {
 type SpotifyTrackIDResult struct {
 	ID    string
 	Error error
+}
+
+type CreatePlaylistResponse struct {
+	ID  string `json:"id"`
+	URI string `json:"uri"`
 }

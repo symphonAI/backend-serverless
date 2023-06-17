@@ -55,6 +55,16 @@ func handlePrompt(ctx context.Context, request events.APIGatewayProxyRequest) (e
 	go cfg.symphonapiClient.GetTopBandsSpotify(spotifyAccessToken, bandChannel)
 	go cfg.symphonapiClient.GetTopTracksSpotify(spotifyAccessToken, trackChannel)
 
+	// can probably get rid of this call if we already have access to the userID somewhere else
+	userData, err := cfg.symphonapiClient.GetUserDataFromSpotify(spotifyAccessToken)
+	if err != nil {
+		return events.APIGatewayProxyResponse{
+			StatusCode: http.StatusInternalServerError,
+		}, err
+	}
+
+	userID := userData.ID
+
 	topBands := <-bandChannel
 	topTracks := <-trackChannel
 
@@ -119,12 +129,21 @@ func handlePrompt(ctx context.Context, request events.APIGatewayProxyRequest) (e
 			StatusCode: http.StatusInternalServerError,
 		}, err
 	}
-
 	fmt.Println("Track IDs:", trackIDs)
+
+	fmt.Println("Creating Playlist")
+	playlistURI, err := cfg.symphonapiClient.CreateRecommendationPlaylist(spotifyAccessToken, userID, trackIDs, prompt, options)
+	if err != nil {
+		return events.APIGatewayProxyResponse{
+			StatusCode: http.StatusInternalServerError,
+		}, err
+	}
+	fmt.Println("Playlist URI:", playlistURI)
+
 	// return response
 	response := events.APIGatewayProxyResponse{
 		StatusCode: http.StatusOK,
-		Body:       chatgptResponse,
+		Body:       playlistURI,
 	}
 
 	return response, nil

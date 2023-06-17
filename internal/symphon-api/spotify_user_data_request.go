@@ -1,13 +1,12 @@
 package symphonapi
 
 import (
-	"context"
 	"net/http"
 	"io/ioutil"
 	"encoding/json"
 )
 
-func (c *Client) GetUserDataFromSpotify(ctx context.Context) (SpotifyUserData, error) {
+func (c *Client) GetUserDataFromSpotify(spotifyAccessToken string) (SpotifyUserData, error) {
 	endpoint := SPOTIFY_BASE_URL + "/me"
 
 	req, err := http.NewRequest("GET", endpoint, nil)
@@ -15,7 +14,6 @@ func (c *Client) GetUserDataFromSpotify(ctx context.Context) (SpotifyUserData, e
 		return SpotifyUserData{}, err
 	}
 
-	spotifyAccessToken := ctx.Value("spotify_access_token").(string)
 	req.Header.Add("Authorization", "Bearer "+spotifyAccessToken)
 
 	resp, err := c.httpClient.Do(req)

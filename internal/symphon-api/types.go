@@ -56,3 +56,7 @@ type SpotifyTrackIDResult struct {
 	ID    string
 	Error error
 }
+
+type CreatePlaylistResponse struct {
+	ID     string `json:"id"`
+}

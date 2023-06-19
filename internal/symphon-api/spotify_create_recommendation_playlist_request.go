@@ -89,6 +89,9 @@ func (c *Client) addTracksToPlaylist(spotifyAccessToken string, playlistID strin
 		"position": 0,
 	}
 
+	fmt.Println("Add tracks to playlist endpoint:", endpoint)
+	fmt.Println("Payload:", payload)
+
 	jsonPayload, err := json.Marshal(payload)
 	if err != nil {
 		return err

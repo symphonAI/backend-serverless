@@ -39,7 +39,7 @@ func (c *Client) getSpotifyTrackID(spotifyAccessToken string, trackName string, 
 		trackIDChannel <- SpotifyTrackIDResult{Error: err}
 		return
 	}
-	trackID := spotifyResponse.Tracks.Items[0].ID
+	trackID := "spotify:track:" + spotifyResponse.Tracks.Items[0].ID
 	fmt.Println("Track ID:", trackID)
 
 	trackIDChannel <- SpotifyTrackIDResult{ID: trackID}

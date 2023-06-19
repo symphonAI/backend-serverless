@@ -3,6 +3,7 @@ package symphonapi
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -14,6 +15,7 @@ func (c *Client) CreateRecommendationPlaylist(spotifyAccessToken string, userId 
 	if err != nil {
 		return "", err
 	}
+	fmt.Println(playlistURI)
 
 	// add tracks to playlist
 	err = c.addTracksToPlaylist(spotifyAccessToken, playlistID, trackIDs)
@@ -70,6 +72,8 @@ func (c *Client) createPlaylist(spotifyAccessToken string, userId string, prompt
 	if err != nil {
 		return "", "", err
 	}
+
+	fmt.Println("Playlist response:", response)
 
 	playlistID := response.ID
 	playlistURI := response.URI

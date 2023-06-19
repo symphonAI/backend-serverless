@@ -84,8 +84,11 @@ func (c *Client) createPlaylist(spotifyAccessToken string, userId string, prompt
 func (c *Client) addTracksToPlaylist(spotifyAccessToken string, playlistID string, trackIDs []string) error {
 	endpoint := SPOTIFY_BASE_URL + "/playlists/" + playlistID + "/tracks"
 
+	commaSeparatedTrackIDs := strings.Join(trackIDs, ",")
+	fmt.Println("Track IDs:", commaSeparatedTrackIDs)
+
 	payload := map[string]interface{}{
-		"uris":     trackIDs,
+		"uris":     commaSeparatedTrackIDs,
 		"position": 0,
 	}
 

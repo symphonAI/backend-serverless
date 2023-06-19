@@ -125,9 +125,7 @@ func handlePrompt(ctx context.Context, request events.APIGatewayProxyRequest) (e
 	fmt.Println("Getting Track IDs")
 	trackIDs, err := cfg.symphonapiClient.GetAllSpotifyTrackIDs(spotifyAccessToken, chatGPTRecommendations)
 	if err != nil {
-		return events.APIGatewayProxyResponse{
-			StatusCode: http.StatusInternalServerError,
-		}, err
+		fmt.Println("Error getting track IDs:", err.Error())
 	}
 	fmt.Println("Track IDs:", trackIDs)
 

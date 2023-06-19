@@ -39,7 +39,7 @@ func (c *Client) getSpotifyTrackID(spotifyAccessToken string, trackName string, 
 		trackIDChannel <- SpotifyTrackIDResult{Error: err}
 		return
 	}
-	if len(spotifyResponse.Tracks.Items[0].ID) > 1 {
+	if len(spotifyResponse.Tracks.Items[0].ID) < 1 {
 		trackIDChannel <- SpotifyTrackIDResult{Error: fmt.Errorf("cannot find song in Spotify")}
 	} else {
 		trackID := "spotify:track:" + spotifyResponse.Tracks.Items[0].ID

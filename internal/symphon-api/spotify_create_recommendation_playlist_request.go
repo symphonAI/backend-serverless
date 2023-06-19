@@ -15,7 +15,8 @@ func (c *Client) CreateRecommendationPlaylist(spotifyAccessToken string, userId 
 	if err != nil {
 		return "", err
 	}
-	fmt.Println(playlistURI)
+	fmt.Println("Playlist URI:", playlistURI)
+	fmt.Println("Playlist ID:", playlistID)
 
 	// add tracks to playlist
 	err = c.addTracksToPlaylist(spotifyAccessToken, playlistID, trackIDs)
@@ -29,6 +30,7 @@ func (c *Client) CreateRecommendationPlaylist(spotifyAccessToken string, userId 
 func (c *Client) createPlaylist(spotifyAccessToken string, userId string, prompt string, options []string) (string, string, error) {
 
 	endpoint := SPOTIFY_BASE_URL + "/me/" + userId + "/playlists"
+	fmt.Println("Playlist endpoint:", endpoint)
 
 	playlistName := prompt + " - " + strings.Join(options, ", ")
 	playlistDescription := "Created by Symphon.ai"
@@ -42,10 +44,14 @@ func (c *Client) createPlaylist(spotifyAccessToken string, userId string, prompt
 		"collaborative": playlistCollaborative,
 	}
 
+	fmt.Println("Playlist payload:", payload)
+
 	jsonPayload, err := json.Marshal(payload)
 	if err != nil {
 		return "", "", err
 	}
+
+	fmt.Println("Playlist jsonPayload:", jsonPayload)
 
 	req, err := http.NewRequest("POST", endpoint, bytes.NewBuffer(jsonPayload))
 	if err != nil {

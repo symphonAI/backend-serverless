@@ -140,10 +140,22 @@ func handlePrompt(ctx context.Context, request events.APIGatewayProxyRequest) (e
 	}
 	fmt.Println("Playlist URI:", playlistURI)
 
+	payload := map[string]interface{}{
+		"requestURI": playlistURI,
+	}
+	jsonPayload, err := json.Marshal(payload)
+	if err != nil {
+		return events.APIGatewayProxyResponse{
+			StatusCode: http.StatusInternalServerError,
+		}, err
+	}
+
+	stringBody := string(jsonPayload)
+
 	// return response
 	response := events.APIGatewayProxyResponse{
 		StatusCode: http.StatusOK,
-		Body:       playlistURI,
+		Body:       stringBody,
 	}
 
 	return response, nil

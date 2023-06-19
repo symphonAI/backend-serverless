@@ -152,6 +152,8 @@ func handlePrompt(ctx context.Context, request events.APIGatewayProxyRequest) (e
 
 	stringBody := string(jsonPayload)
 
+	fmt.Println("Returning response:", stringBody)
+
 	// return response
 	response := events.APIGatewayProxyResponse{
 		StatusCode: http.StatusOK,

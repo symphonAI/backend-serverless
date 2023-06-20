@@ -76,6 +76,7 @@ func handlePrompt(ctx context.Context, request events.APIGatewayProxyRequest) (e
 		return response, errors.New(errorString)
 	}
 
+	fmt.Println("Generating cookie...")
 	cookie := &http.Cookie{
         Name:     "jwt",
         Value:    jwToken,
@@ -87,6 +88,7 @@ func handlePrompt(ctx context.Context, request events.APIGatewayProxyRequest) (e
     }
 	headers := make(map[string]string)
     headers["Set-Cookie"] = cookie.String()
+	fmt.Println("Set-Cookie header:", headers["Set-Cookie"])
 
 	response := events.APIGatewayProxyResponse{
 		StatusCode: http.StatusOK, 

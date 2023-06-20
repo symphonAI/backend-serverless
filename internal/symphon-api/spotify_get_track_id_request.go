@@ -6,11 +6,15 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"strings"
 )
 
 func (c *Client) getSpotifyTrackID(spotifyAccessToken string, trackName string, artistName string, trackIDChannel chan SpotifyTrackIDResult) {
+	trackName = removeUnsupportedCharacters(trackName)
+	artistName = removeUnsupportedCharacters(artistName)
 	query := "/search?q=track:" + url.QueryEscape(trackName) + "%20artist:" + url.QueryEscape(artistName) + "&type=track&limit=1"
 	endpoint := SPOTIFY_BASE_URL + query
+	fmt.Println("Making GET request to:", endpoint)
 
 	req, err := http.NewRequest("GET", endpoint, nil)
 	if err != nil {
@@ -37,6 +41,10 @@ func (c *Client) getSpotifyTrackID(spotifyAccessToken string, trackName string, 
 	err = json.Unmarshal(responseBody, &spotifyResponse)
 	if err != nil {
 		trackIDChannel <- SpotifyTrackIDResult{Error: err}
+		return
+	}
+	if len(spotifyResponse.Tracks.Items) == 0 {
+		fmt.Println("WARNING: Could not find track:", trackName, artistName)
 		return
 	}
 	if len(spotifyResponse.Tracks.Items[0].ID) < 1 {
@@ -70,4 +78,9 @@ func (c *Client) GetAllSpotifyTrackIDs(spotifyAccessToken string, chatGPTRecomme
 	}
 
 	return trackIDs, err
+}
+
+func removeUnsupportedCharacters(input string) string {
+	output := strings.ReplaceAll(input, "'", "")
+	return output
 }

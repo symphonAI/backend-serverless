@@ -127,9 +127,9 @@ func handlePrompt(ctx context.Context, request events.APIGatewayProxyRequest) (e
 	if err != nil {
 		fmt.Println("Error getting track IDs:", err.Error())
 	}
-	fmt.Println("Track IDs:", trackIDs)
+	fmt.Println("Received Track IDs:", trackIDs)
 
-	fmt.Println("Creating Playlist")
+	fmt.Println("Creating Playlist...")
 	playlistURI, err := cfg.symphonapiClient.CreateRecommendationPlaylist(spotifyAccessToken, userID, trackIDs, prompt, options)
 	if err != nil {
 		return events.APIGatewayProxyResponse{

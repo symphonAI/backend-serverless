@@ -33,7 +33,7 @@ func (c *Client) PromptChatGPT(userFields UserFields) (string, error) {
 		return "", err
 	}
 	req.Header.Add("Content-Type", "application/json")
-	req.Header.Add("Authorization", "Bearer "+c.apiKey)
+	req.Header.Add("Authorization", "Bearer " + c.apiKey)
 
 	resp, err := c.httpClient.Do(req)
 	if err != nil {

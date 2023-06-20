@@ -120,9 +120,7 @@ func handlePrompt(ctx context.Context, request events.APIGatewayProxyRequest) (e
 
 	fmt.Println("Chat GPT Recommendations:", chatGPTRecommendations)
 
-	// build spotify playlist here
-
-	fmt.Println("Getting Track IDs")
+	fmt.Println("Getting Track IDs...")
 	trackIDs, err := cfg.symphonapiClient.GetAllSpotifyTrackIDs(spotifyAccessToken, chatGPTRecommendations)
 	if err != nil {
 		fmt.Println("Error getting track IDs:", err.Error())

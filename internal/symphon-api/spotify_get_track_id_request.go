@@ -44,7 +44,9 @@ func (c *Client) getSpotifyTrackID(spotifyAccessToken string, trackName string, 
 		return
 	}
 	if len(spotifyResponse.Tracks.Items) == 0 {
-		fmt.Println("WARNING: Could not find track:", trackName, artistName)
+		eMsg := fmt.Sprintf("Could not find track: %v - %v", trackName, artistName)
+		fmt.Println(eMsg)
+		trackIDChannel <- SpotifyTrackIDResult{Error: fmt.Errorf(eMsg)}
 		return
 	}
 	if len(spotifyResponse.Tracks.Items[0].ID) < 1 {

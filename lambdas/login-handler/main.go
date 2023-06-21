@@ -82,7 +82,7 @@ func handlePrompt(ctx context.Context, request events.APIGatewayProxyRequest) (e
         Value:    jwToken,
         Expires:  time.Now().Add(24 * time.Hour),
         HttpOnly: true,
-		SameSite: http.SameSiteNoneMode,
+		SameSite: http.SameSiteStrictMode,
         Secure:   true,
 		Domain: request.RequestContext.DomainName,
     }

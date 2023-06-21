@@ -19,7 +19,7 @@ func logout(ctx context.Context, request events.APIGatewayProxyRequest) (events.
         Name:     "jwt",
 		MaxAge:   -1,
         HttpOnly: true,
-		SameSite: http.SameSiteNoneMode,
+		SameSite: http.SameSiteStrictMode,
         Secure:   true,
 		Domain: request.RequestContext.DomainName,
     }

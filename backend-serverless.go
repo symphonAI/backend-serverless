@@ -8,6 +8,7 @@ import (
 	"github.com/aws/aws-cdk-go/awscdk"
 	"github.com/aws/aws-cdk-go/awscdk/awsapigatewayv2"
 	"github.com/aws/aws-cdk-go/awscdk/awsapigatewayv2integrations"
+	"github.com/aws/aws-cdk-go/awscdk/awscertificatemanager"
 	"github.com/aws/aws-cdk-go/awscdk/awsdynamodb"
 	"github.com/aws/aws-cdk-go/awscdk/awsiam"
 	"github.com/aws/aws-cdk-go/awscdk/awslambda"
@@ -62,6 +63,34 @@ func NewBackendServerlessStack(scope constructs.Construct, id string, props *Bac
 			MaxAge:        awscdk.Duration_Minutes(&max_age_in_minutes),
 		},
 	})
+
+	apiGwDomainName := awsapigatewayv2.NewDomainName(stack, jsii.String("symphonaiapigwdomain"), &awsapigatewayv2.DomainNameProps{
+		Certificate: awscertificatemanager.Certificate_FromCertificateArn(
+			stack, jsii.String("symphonaicert"), 
+			jsii.String("arn:aws:acm:ap-southeast-2:349564020337:certificate/31bac708-a985-4350-b584-e21abc042cbc")),
+		DomainName: jsii.String("api.symphon.ai"),
+		EndpointType: awsapigatewayv2.EndpointType_REGIONAL,
+	})
+
+	awsapigatewayv2.NewApiMapping(stack, jsii.String("symphonai-api-mapping"), &awsapigatewayv2.ApiMappingProps{
+		Api: api,
+		DomainName: apiGwDomainName,
+	})
+
+	// This part, specifically creation of the new A Record is just hanging
+	// TODO figure out why
+	// symphonAiHostedZone := awsroute53.HostedZone_FromHostedZoneAttributes(stack, jsii.String("symphonai-hz"), &awsroute53.HostedZoneAttributes{
+	// 	HostedZoneId: jsii.String("Z0045186G26CSUNVWCC5"),
+	// 	ZoneName: jsii.String("symphon.ai"),
+	// })
+	// awsroute53.NewARecord(stack, jsii.String("apirecord"), &awsroute53.ARecordProps{
+	// 	Zone: symphonAiHostedZone,
+	// 	// RecordName: jsii.String("api.symphon.ai"),
+	// 	Target: awsroute53.RecordTarget_FromAlias(
+	// 		awsroute53targets.NewApiGatewayv2DomainProperties(
+	// 			apiGwDomainName.RegionalDomainName(), 
+	// 			apiGwDomainName.RegionalHostedZoneId()),
+	// )})
 
 	customAuthorizerEnvVars := make(map[string]*string)
 	customAuthorizerEnvVars["DYNAMODB_TABLE_NAME"] = ddbTable.TableName()

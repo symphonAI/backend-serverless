@@ -170,6 +170,13 @@ func NewBackendServerlessStack(scope constructs.Construct, id string, props *Bac
 
 	promptLambdaEnvVars := make(map[string]*string)
 
+	/*
+		Current available models:
+			"davinci"
+			"gpt-3.5-turbo"
+	*/
+	promptLambdaEnvVars["OPENAI_MODEL"] = jsii.String("gpt-3.5-turbo")
+
 	addSecretCredentialsToEnvVars(promptLambdaEnvVars)
 
 	durationInMinutes := 10.00

@@ -45,9 +45,8 @@ func handlePrompt(ctx context.Context, request events.APIGatewayProxyRequest) (e
 	fmt.Println("Received options:", options)
 
 	// access spotify token from context
-
 	spotifyAccessToken := request.RequestContext.Authorizer["lambda"].(map[string]interface{})["accessToken"].(string)
-
+	
 	// get top bands and tracks concurrently
 	bandChannel := make(chan symphonapi.SpotifyResult)
 	trackChannel := make(chan symphonapi.SpotifyResult)
@@ -101,7 +100,7 @@ func handlePrompt(ctx context.Context, request events.APIGatewayProxyRequest) (e
 		Temperature: temperature,
 	}
 
-	fmt.Println("Getting recommened tracks from ChatGPT API...")
+	fmt.Println("Getting recommended tracks from ChatGPT API...")
 	recommendedTracks, err := cfg.symphonapiClient.GetRecommendedTracks(userFields)
 	if err != nil {
 		return events.APIGatewayProxyResponse{

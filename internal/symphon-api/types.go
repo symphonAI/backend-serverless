@@ -7,7 +7,7 @@ type UserFields struct {
 }
 
 type Track struct {
-	Title string `json:"title"`
+	Title string `json:"track"`
 	Artist string `json:"artist"`
 }
 

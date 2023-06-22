@@ -167,7 +167,6 @@ func NewBackendServerlessStack(scope constructs.Construct, id string, props *Bac
 
 
 	// Prompt lambda function.
-
 	promptLambdaEnvVars := make(map[string]*string)
 
 	/*

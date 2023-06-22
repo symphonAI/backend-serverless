@@ -20,7 +20,7 @@ func (m *ChatGPT3Point5TurboModel) GeneratePayload(userFields UserFields) (map[s
 	// TODO one day this will be cleaned up...
 	// but today is not that day
 	payload := map[string]interface{}{
-		"model":       "gpt-3.5-turbo",
+		"model":       "gpt-3.5-turbo-0613",
 		"max_tokens":  2000,
 		"temperature": floatTemperature,
 		"messages": []map[string]interface{}{
@@ -49,7 +49,7 @@ func (m *ChatGPT3Point5TurboModel) GeneratePayload(userFields UserFields) (map[s
 										"type":        "string",
 										"description": "The artist of the track.",
 									},
-									"title": map[string]interface{}{
+									"track": map[string]interface{}{
 										"type":        "string",
 										"description": "The title of the track.",
 									},
@@ -74,13 +74,12 @@ func (m *ChatGPT3Point5TurboModel) ParseRecommendedTracksFromResponse(responseBo
 	if err != nil {
 		return []Track{}, err
 	}
-
-	var tracks []Track
-	err = json.Unmarshal([]byte(response.Choices[0].ChatGPTFunctionMessage.ChatGPTFunctionCall.Arguments), &tracks)
+	var tracklist TracklistResponse
+	err = json.Unmarshal([]byte(response.Choices[0].ChatGPTFunctionMessage.ChatGPTFunctionCall.Arguments), &tracklist)
 	if err != nil {
 		return []Track{}, err
 	}
-	return tracks, nil
+	return tracklist.Tracks, nil
 }
 
 type ChatGPTFunctionResponse struct {
@@ -101,5 +100,5 @@ type ChatGPTFunctionCall struct {
 }
 
 type TracklistResponse struct {
-	Tracklist []Track `json:"tracklist"`
+	Tracks []Track `json:"tracklist"`
 }

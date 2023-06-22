@@ -40,3 +40,10 @@ func (m *DaVinciModel) ParseRecommendedTracksFromResponse(responseBody []byte) (
 
 	return tracks, nil
 }
+
+type ChatGPTResponse struct {
+	Choices []struct {
+		Text string `json:"text"`
+
+	} `json:"choices"`
+}

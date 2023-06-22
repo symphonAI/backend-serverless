@@ -6,34 +6,6 @@ type UserFields struct {
 	Options     []string
 }
 
-type ChatGPTResponse struct {
-	Choices []struct {
-		Text string `json:"text"`
-
-	} `json:"choices"`
-}
-
-type ChatGPTFunctionResponse struct {
-	Choices []ChatGPTFunctionChoice `json:"choices"` 
-}
-
-type ChatGPTFunctionChoice struct {
-	ChatGPTFunctionMessage ChatGPTFunctionMessage `json:"message"`
-}
-
-type ChatGPTFunctionMessage struct {
-	ChatGPTFunctionCall ChatGPTFunctionCall `json:"function_call"`
-}
-
-type ChatGPTFunctionCall struct {
-	Name string `json:"name"`
-	Arguments string `json:"arguments"`
-}
-
-type TracklistResponse struct {
-	Tracklist []Track `json:"tracklist"`
-}
-
 type Track struct {
 	Title string `json:"title"`
 	Artist string `json:"artist"`

@@ -9,7 +9,34 @@ type UserFields struct {
 type ChatGPTResponse struct {
 	Choices []struct {
 		Text string `json:"text"`
+
 	} `json:"choices"`
+}
+
+type ChatGPTFunctionResponse struct {
+	Choices []ChatGPTFunctionChoice `json:"choices"` 
+}
+
+type ChatGPTFunctionChoice struct {
+	ChatGPTFunctionMessage ChatGPTFunctionMessage `json:"message"`
+}
+
+type ChatGPTFunctionMessage struct {
+	ChatGPTFunctionCall ChatGPTFunctionCall `json:"function_call"`
+}
+
+type ChatGPTFunctionCall struct {
+	Name string `json:"name"`
+	Arguments string `json:"arguments"`
+}
+
+type TracklistResponse struct {
+	Tracklist []Track `json:"tracklist"`
+}
+
+type Track struct {
+	Title string `json:"title"`
+	Artist string `json:"artist"`
 }
 
 type SpotifyTrackResponse struct {
@@ -37,11 +64,6 @@ type SpotifyUserData struct {
 	ID          string `json:"id"`
 	Email       string `json:"email"`
 	ImageURL    string `json:"image_url"`
-}
-
-type ChatGPTRecommendations []struct {
-	Artist string `json:"artist"`
-	Track  string `json:"track"`
 }
 
 type SpotifyTrackIDResponse struct {

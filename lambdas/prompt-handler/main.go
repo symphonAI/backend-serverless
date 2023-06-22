@@ -101,27 +101,15 @@ func handlePrompt(ctx context.Context, request events.APIGatewayProxyRequest) (e
 		Temperature: temperature,
 	}
 
-	chatgptResponse, err := cfg.symphonapiClient.PromptChatGPT(userFields)
+	recommendedTracks, err := cfg.symphonapiClient.PromptChatGPT(userFields)
 	if err != nil {
 		return events.APIGatewayProxyResponse{
 			StatusCode: http.StatusInternalServerError,
 		}, err
 	}
-
-	fmt.Println("Chat GPT Response:", chatgptResponse)
-
-	chatGPTRecommendations := symphonapi.ChatGPTRecommendations{}
-	err = json.Unmarshal([]byte(chatgptResponse), &chatGPTRecommendations)
-	if err != nil {
-		return events.APIGatewayProxyResponse{
-			StatusCode: http.StatusInternalServerError,
-		}, err
-	}
-
-	fmt.Println("Chat GPT Recommendations:", chatGPTRecommendations)
 
 	fmt.Println("Getting Track IDs...")
-	trackIDs, err := cfg.symphonapiClient.GetAllSpotifyTrackIDs(spotifyAccessToken, chatGPTRecommendations)
+	trackIDs, err := cfg.symphonapiClient.GetAllSpotifyTrackIDs(spotifyAccessToken, recommendedTracks)
 	if err != nil {
 		fmt.Println("Error getting track IDs:", err.Error())
 	}

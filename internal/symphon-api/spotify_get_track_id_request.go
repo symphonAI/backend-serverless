@@ -58,19 +58,19 @@ func (c *Client) getSpotifyTrackID(spotifyAccessToken string, trackName string, 
 	}
 }
 
-func (c *Client) GetAllSpotifyTrackIDs(spotifyAccessToken string, chatGPTRecommendations ChatGPTRecommendations) ([]string, error) {
+func (c *Client) GetAllSpotifyTrackIDs(spotifyAccessToken string, recommendedTracks []Track) ([]string, error) {
 
-	trackIDChannel := make(chan SpotifyTrackIDResult, len(chatGPTRecommendations))
+	trackIDChannel := make(chan SpotifyTrackIDResult, len(recommendedTracks))
 	defer close(trackIDChannel)
 
-	for _, recommendation := range chatGPTRecommendations {
-		go c.getSpotifyTrackID(spotifyAccessToken, recommendation.Track, recommendation.Artist, trackIDChannel)
+	for _, recommendedTrack := range recommendedTracks {
+		go c.getSpotifyTrackID(spotifyAccessToken, recommendedTrack.Title, recommendedTrack.Artist, trackIDChannel)
 	}
 
 	trackIDs := []string{}
 	err := error(nil)
 
-	for range chatGPTRecommendations {
+	for range recommendedTracks {
 		trackIDResult := <-trackIDChannel
 		if trackIDResult.Error != nil {
 			err = trackIDResult.Error

@@ -26,17 +26,48 @@ You can try running the API locally using the SAM CLI, but no guarantees all the
 1. Carry out all the steps in the _Developer Setup_ section above.
 2. Install Docker (https://www.docker.com/)
 3. Install the SAM CLI (https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html)
+4. Create a `env.json` file in this root directory, with this format:
+
+   ```
+   {
+       "Parameters": {
+           "OPENAI_MODEL": "<<model>>",
+           "OPENAI_API_KEY": "<<apikey>>"
+       }
+   }
+   ```
+
+   Replace `<<model>>` with one of the following, depending on which model
+   you want to use:
+
+   - davinci
+   - gpt-3.5-turbo
+
+   Replace `<<apikey>>` with the ChatGPT API Key you want to use.
+
+   `env.json` is in the .gitignore, but just in case: **Please do not check in this file to version control!**
 
 ### Steps to Run Locally
 
+First follow the steps above (**Setup Steps for Running Locally**), then do the following:
+
 1. Make sure Docker is running.
+
+1a. If you want to invoke the prompt lambda locally, for now you will have to:
+
+- TEMPORARILY disable the custom authoriser setup for the prompt lambda in the `backend-serverless.go` file. If you're not sure how to do this, please ask one of the devs.
+
+- TEMPORARILY hardcode a spotifyAccessToken in the correct place in the prompt lambda (so that you can invoke Spotify API from your local API without having to log in). Again if you're not sure how to do this, please ask one of the devs.
+
+**IMPORTANT NOTE: Please revert these changes after you're done running locally!**
+
 2. In the CLI, navigate to this directory and run: `make start`. This will expose the API on http://localhost:8080, so you will be able to hit API endpoints like http://localhost:8080/prompt.
 
 **Note:** If the `make` command doesn't work on your machine, then you will need to install Make. The exact instructions vary depending on your OS, so you might have to Google....here are instructions for Ubuntu: https://linuxhint.com/install-make-ubuntu/
 
 If you are unable to install make, then run the individual commands under `make start` that are listed in the `Makefile` contained within the root directory.
 
-4. Press Ctrl+C to stop running the API on your machine.
+3. Press Ctrl+C to stop running the API on your machine.
 
 ## Deployment
 

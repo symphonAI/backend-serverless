@@ -6,10 +6,9 @@ type UserFields struct {
 	Options     []string
 }
 
-type ChatGPTResponse struct {
-	Choices []struct {
-		Text string `json:"text"`
-	} `json:"choices"`
+type Track struct {
+	Title string `json:"track"`
+	Artist string `json:"artist"`
 }
 
 type SpotifyTrackResponse struct {
@@ -39,11 +38,6 @@ type SpotifyUserData struct {
 	ImageURL    string `json:"image_url"`
 }
 
-type ChatGPTRecommendations []struct {
-	Artist string `json:"artist"`
-	Track  string `json:"track"`
-}
-
 type SpotifyTrackIDResponse struct {
 	Tracks struct {
 		Items []struct {
@@ -60,4 +54,10 @@ type SpotifyTrackIDResult struct {
 type CreatePlaylistResponse struct {
 	ID  string `json:"id"`
 	URI string `json:"uri"`
+}
+
+type OpenAIModel interface {
+	GeneratePayload(userFields UserFields) (map[string]interface{}, error)
+	GetUrl() string
+	ParseRecommendedTracksFromResponse([]byte) ([]Track, error)
 }

@@ -45,9 +45,8 @@ func handlePrompt(ctx context.Context, request events.APIGatewayProxyRequest) (e
 	fmt.Println("Received options:", options)
 
 	// access spotify token from context
-
 	spotifyAccessToken := request.RequestContext.Authorizer["lambda"].(map[string]interface{})["accessToken"].(string)
-
+	
 	// get top bands and tracks concurrently
 	bandChannel := make(chan symphonapi.SpotifyResult)
 	trackChannel := make(chan symphonapi.SpotifyResult)
@@ -101,27 +100,16 @@ func handlePrompt(ctx context.Context, request events.APIGatewayProxyRequest) (e
 		Temperature: temperature,
 	}
 
-	chatgptResponse, err := cfg.symphonapiClient.PromptChatGPT(userFields)
+	fmt.Println("Getting recommended tracks from ChatGPT API...")
+	recommendedTracks, err := cfg.symphonapiClient.GetRecommendedTracks(userFields)
 	if err != nil {
 		return events.APIGatewayProxyResponse{
 			StatusCode: http.StatusInternalServerError,
 		}, err
 	}
-
-	fmt.Println("Chat GPT Response:", chatgptResponse)
-
-	chatGPTRecommendations := symphonapi.ChatGPTRecommendations{}
-	err = json.Unmarshal([]byte(chatgptResponse), &chatGPTRecommendations)
-	if err != nil {
-		return events.APIGatewayProxyResponse{
-			StatusCode: http.StatusInternalServerError,
-		}, err
-	}
-
-	fmt.Println("Chat GPT Recommendations:", chatGPTRecommendations)
 
 	fmt.Println("Getting Track IDs...")
-	trackIDs, err := cfg.symphonapiClient.GetAllSpotifyTrackIDs(spotifyAccessToken, chatGPTRecommendations)
+	trackIDs, err := cfg.symphonapiClient.GetAllSpotifyTrackIDs(spotifyAccessToken, recommendedTracks)
 	if err != nil {
 		fmt.Println("Error getting track IDs:", err.Error())
 	}

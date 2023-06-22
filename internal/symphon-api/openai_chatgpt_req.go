@@ -5,22 +5,14 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
-	"strconv"
 )
 
-func (c *Client) PromptChatGPT(userFields UserFields) ([]Track, error) {
-	endpoint := OPENAI_BASE_URL + "/completions"
+func (c *Client) GetRecommendedTracks(userFields UserFields) ([]Track, error) {
+	endpoint := c.openAIModel.GetUrl()
 
-	floatTemperature, err := strconv.ParseFloat(userFields.Temperature, 64)
+	payload, err := c.openAIModel.GeneratePayload(userFields)
 	if err != nil {
 		return []Track{}, err
-	}
-
-	payload := map[string]interface{}{
-		"model":       "text-davinci-003",
-		"max_tokens":  2000,
-		"temperature": floatTemperature,
-		"prompt":      userFields.Prompt,
 	}
 
 	jsonPayload, err := json.Marshal(payload)
@@ -46,17 +38,10 @@ func (c *Client) PromptChatGPT(userFields UserFields) ([]Track, error) {
 		return []Track{}, err
 	}
 
-	response := ChatGPTResponse{}
-	err = json.Unmarshal(responseBody, &response)
+	tracks, err := c.openAIModel.ParseRecommendedTracksFromResponse(responseBody)
 	if err != nil {
 		return []Track{}, err
 	}
-
-	var tracks []Track
-	err = json.Unmarshal([]byte(response.Choices[0].Text), &tracks)
-	if err != nil {
-		return []Track{}, err
-	}
-
+	
 	return tracks, nil
 }

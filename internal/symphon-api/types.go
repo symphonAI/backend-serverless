@@ -83,3 +83,9 @@ type CreatePlaylistResponse struct {
 	ID  string `json:"id"`
 	URI string `json:"uri"`
 }
+
+type OpenAIModel interface {
+	GeneratePayload(userFields UserFields) (map[string]interface{}, error)
+	GetUrl() string
+	ParseRecommendedTracksFromResponse([]byte) ([]Track, error)
+}

@@ -101,7 +101,8 @@ func handlePrompt(ctx context.Context, request events.APIGatewayProxyRequest) (e
 		Temperature: temperature,
 	}
 
-	recommendedTracks, err := cfg.symphonapiClient.PromptChatGPT(userFields)
+	fmt.Println("Getting recommened tracks from ChatGPT API...")
+	recommendedTracks, err := cfg.symphonapiClient.GetRecommendedTracks(userFields)
 	if err != nil {
 		return events.APIGatewayProxyResponse{
 			StatusCode: http.StatusInternalServerError,

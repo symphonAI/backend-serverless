@@ -42,6 +42,7 @@ You can try running the API locally using the SAM CLI, but no guarantees all the
 
    - davinci
    - gpt-3.5-turbo
+   - gpt-4
 
    Replace `<<apikey>>` with the ChatGPT API Key you want to use.
 

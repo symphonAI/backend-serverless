@@ -5,13 +5,15 @@ import (
 	"strconv"
 )
 
-type ChatGPT3Point5TurboModel struct {}
+type ChatCompletionModel struct {
+	chatGptApiLLMModel string
+}
 
-func (m *ChatGPT3Point5TurboModel) GetUrl() string {
+func (m *ChatCompletionModel) GetUrl() string {
 	return OPENAI_BASE_URL + "/chat/completions"
 }
 
-func (m *ChatGPT3Point5TurboModel) GeneratePayload(userFields UserFields) (map[string]interface{}, error) {
+func (m *ChatCompletionModel) GeneratePayload(userFields UserFields) (map[string]interface{}, error) {
 	floatTemperature, err := strconv.ParseFloat(userFields.Temperature, 64)
 	if err != nil {
 		return nil, err
@@ -20,7 +22,7 @@ func (m *ChatGPT3Point5TurboModel) GeneratePayload(userFields UserFields) (map[s
 	// TODO one day this will be cleaned up...
 	// but today is not that day
 	payload := map[string]interface{}{
-		"model":       "gpt-3.5-turbo-0613",
+		"model":       m.chatGptApiLLMModel,
 		"max_tokens":  2000,
 		"temperature": floatTemperature,
 		"messages": []map[string]interface{}{
@@ -68,7 +70,7 @@ func (m *ChatGPT3Point5TurboModel) GeneratePayload(userFields UserFields) (map[s
 	return payload, nil
 }
 
-func (m *ChatGPT3Point5TurboModel) ParseRecommendedTracksFromResponse(responseBody []byte) ([]Track, error) {
+func (m *ChatCompletionModel) ParseRecommendedTracksFromResponse(responseBody []byte) ([]Track, error) {
 	response := ChatGPTFunctionResponse{}
 	err := json.Unmarshal(responseBody, &response)
 	if err != nil {

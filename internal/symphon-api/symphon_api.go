@@ -38,7 +38,13 @@ func getModel(model string) (OpenAIModel, error) {
 	case "davinci":
 		return &DaVinciModel{}, nil
 	case "gpt-3.5-turbo":
-		return &ChatGPT3Point5TurboModel{}, nil
+		return &ChatCompletionModel{
+			chatGptApiLLMModel: "gpt-3.5-turbo-0613",
+		}, nil
+	case "gpt-4":
+		return &ChatCompletionModel{
+			chatGptApiLLMModel: "gpt-4-0613",
+		}, nil
 	default:
 		return nil, fmt.Errorf("could not find supported model with name: %v", model)
 	}

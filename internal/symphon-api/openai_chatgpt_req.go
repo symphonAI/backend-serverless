@@ -17,6 +17,7 @@ func (c *Client) GetRecommendedTracks(userFields UserFields) ([]Track, error) {
 		return []Track{}, err
 	}
 
+
 	jsonPayload, err := json.Marshal(payload)
 	if err != nil {
 		fmt.Println("An error occurred while marshalling the payload for the ChatGPT API:", err)
@@ -30,6 +31,8 @@ func (c *Client) GetRecommendedTracks(userFields UserFields) ([]Track, error) {
 	}
 	req.Header.Add("Content-Type", "application/json")
 	req.Header.Add("Authorization", "Bearer " + c.apiKey)
+
+	fmt.Println("Request to ChatGPT:", req)
 
 	resp, err := c.httpClient.Do(req)
 	if err != nil {

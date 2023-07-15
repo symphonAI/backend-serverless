@@ -14,28 +14,29 @@ func EngineerPrompt(prompt string, topBands []string, topTracks []string, option
 	} else {
 		fmt.Println("EXPLORE_MODE SET")
 	}
+	fmt.Println("Prompt:", prompt)
 	return prompt, nil
 }
 
 func askForJSON(prompt string) string {
-	ask := `You are a music recommendations AI. You make music recommendations based on the user prompt and their listening preferences. The user will prompt you for music. Please respond with data in the format {"artist": artist, "track": song}, within a JSON Array. Please give me ` + NUMBER_OF_TRACKS + ` songs only. Please give me the response in JSON. Do not give me anything other than JSON. Here is the user prompt: `
-	return ask + prompt
+	ask := `You are a music recommendations AI. Please make music recommendations based on my prompt. Please respond with songs in the format {"artist": artist, "track": song}, within a JSON Array. Please return ` + NUMBER_OF_TRACKS + ` songs only. Please give me the response in JSON. Do not give me anything other than JSON. Here is my prompt, within tilde (~~~) signs: ~~~`
+	return ask + prompt + "~~~"
 }
 
 func addTopBandsToPrompt(prompt string, topBands []string) string {
-	prompt = prompt + " These are the user's most listened to bands from the last month: "
+	prompt = prompt + " Within pound signs (£££) are my most-listened to musicians within the last month. Please use these to inform your music recommendations, but do not include music from these musicians: £££"
 	for _, band := range topBands {
 		prompt += band + ", "
 	}
-	return prompt
+	return prompt + "£££"
 }
 
 func addTopTracksToPrompt(prompt string, topTracks []string) string {
-	prompt = prompt + " These are the user's most listened to songs from the last month: "
+	prompt = prompt + " Within caret signs (^^^) are my most-listened to musicians within the last month. Please use these to inform your music recommendations, but do not include these specific songs or musicians who performed these songs:  ^^^"
 	for _, band := range topTracks {
 		prompt += band + ", "
 	}
-	return prompt
+	return prompt + "^^^"
 }
 
 func contains(s []string, str string) bool {

@@ -6,6 +6,8 @@ import (
 	"errors"
 	"fmt"
 
+	utils "backend-serverless/internal/utils"
+
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 )
@@ -13,7 +15,9 @@ import (
 func authorize(ctx context.Context, event events.APIGatewayV2CustomAuthorizerV2Request) (events.APIGatewayCustomAuthorizerResponse, error) {
 	fmt.Println("Custom authorizer called:", event)
 
-	cookieStr := event.Headers["cookie"]
+	headers := utils.LowercaseKeyMap(event.Headers)
+
+	cookieStr := headers["cookie"]
 
 	tokenString := extractJwtFromCookie(cookieStr)
 
@@ -26,6 +30,7 @@ func authorize(ctx context.Context, event events.APIGatewayV2CustomAuthorizerV2R
 		fmt.Println("JWT is not valid")
 		return events.APIGatewayCustomAuthorizerResponse{}, errors.New("Unauthorized") // Return a 401 Unauthorized response
 	}
+	fmt.Println("JWT claims:", jwtClaims)
 
 	user, err := getUserFromDB(jwtClaims["user"].(string))
 	if err != nil {

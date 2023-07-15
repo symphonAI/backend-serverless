@@ -9,6 +9,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/aws/aws-lambda-go/events"
@@ -44,7 +45,7 @@ func handlePrompt(ctx context.Context, request events.APIGatewayProxyRequest) (e
 
 	// Get User Email
 	id, email, err := getUserIdentifiers(access_token)
-	fmt.Println("User email:", email)
+	fmt.Println("User email from Spotify:", email)
 	if err != nil {
 		errorString := fmt.Sprintf("unable to get user identifiers: %s", err.Error())
 		response := events.APIGatewayProxyResponse{
@@ -88,6 +89,13 @@ func handlePrompt(ctx context.Context, request events.APIGatewayProxyRequest) (e
     }
 	headers := make(map[string]string)
     headers["Set-Cookie"] = cookie.String()
+	// Have to do this annoying workaround because  
+	// SAM CLI https://github.com/aws/aws-sam-cli/issues/4161
+	// TODO remove this when the issue is fixed
+	if os.Getenv("ENV") == "dev" {
+		headers["Access-Control-Allow-Origin"] = "http://localhost:3000"
+		headers["Access-Control-Allow-Credentials"] = "true"
+	}
 	fmt.Println("Set-Cookie header:", headers["Set-Cookie"])
 
 	response := events.APIGatewayProxyResponse{

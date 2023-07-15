@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"os"
 
 	promptengineering "backend-serverless/internal/prompt-engineering"
 	symphonapi "backend-serverless/internal/symphon-api"
@@ -138,10 +139,19 @@ func handlePrompt(ctx context.Context, request events.APIGatewayProxyRequest) (e
 
 	fmt.Println("Returning response:", stringBody)
 
-	// return response
+	headers := make(map[string]string)
+	// Have to do this annoying workaround because  
+	// SAM CLI https://github.com/aws/aws-sam-cli/issues/4161
+	// TODO remove this when the issue is fixed
+	if os.Getenv("ENV") == "dev" {
+		headers["Access-Control-Allow-Origin"] = "http://localhost:3000"
+		headers["Access-Control-Allow-Credentials"] = "true"
+	}
+
 	response := events.APIGatewayProxyResponse{
 		StatusCode: http.StatusOK,
 		Body:       stringBody,
+		Headers: headers,
 	}
 
 	return response, nil

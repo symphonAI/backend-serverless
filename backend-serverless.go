@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"os"
 
 	"github.com/aws/aws-cdk-go/awscdk"
 	"github.com/aws/aws-cdk-go/awscdk/awsapigatewayv2"
@@ -25,6 +26,10 @@ type BackendServerlessStackProps struct {
 }
 
 func NewBackendServerlessStack(scope constructs.Construct, id string, props *BackendServerlessStackProps) awscdk.Stack {
+
+	env := os.Getenv("ENV")
+	fmt.Println("Deploying for env:", env)
+
 	var sprops awscdk.StackProps
 	if props != nil {
 		sprops = props.StackProps
@@ -51,9 +56,13 @@ func NewBackendServerlessStack(scope constructs.Construct, id string, props *Bac
 	// Create a new api HTTP api on gateway v2.
 	max_age_in_minutes := 10.00
 	allowCredentials := true
+	corsOrigin := "https://symphon.ai" // URL of the website on AWS
+	if env == "dev" {
+		corsOrigin = "http://localhost:3000" // URL of the website when running locally
+	}
 	api := awsapigatewayv2.NewHttpApi(stack, jsii.String("symphonai-api"), &awsapigatewayv2.HttpApiProps{
 		CorsPreflight: &awsapigatewayv2.CorsPreflightOptions{
-			AllowOrigins: &[]*string{jsii.String("https://symphon.ai"), jsii.String("http://localhost:3000")}, // Provide a list of allowed origins
+			AllowOrigins: &[]*string{jsii.String(corsOrigin)}, // Provide a list of allowed origins
 			AllowMethods: &[]awsapigatewayv2.CorsHttpMethod{
 				awsapigatewayv2.CorsHttpMethod_ANY,
 			},
@@ -93,6 +102,7 @@ func NewBackendServerlessStack(scope constructs.Construct, id string, props *Bac
 	// )})
 
 	customAuthorizerEnvVars := make(map[string]*string)
+	customAuthorizerEnvVars["ENV"] = &env
 	customAuthorizerEnvVars["DYNAMODB_TABLE_NAME"] = ddbTable.TableName()
 	addSecretCredentialsToEnvVars(customAuthorizerEnvVars)
 
@@ -175,7 +185,8 @@ func NewBackendServerlessStack(scope constructs.Construct, id string, props *Bac
 			"gpt-3.5-turbo"
 	*/
 	promptLambdaEnvVars["OPENAI_MODEL"] = jsii.String("gpt-3.5-turbo")
-
+	promptLambdaEnvVars["ENV"] = &env
+	
 	addSecretCredentialsToEnvVars(promptLambdaEnvVars)
 
 	durationInMinutes := 10.00
@@ -216,6 +227,7 @@ func NewBackendServerlessStack(scope constructs.Construct, id string, props *Bac
 
 	// Assign the values to the map
 	loginLambdaEnvVars["DYNAMODB_TABLE_NAME"] = ddbTable.TableName()
+	loginLambdaEnvVars["ENV"] = &env
 
 	addSecretCredentialsToEnvVars(loginLambdaEnvVars)
 

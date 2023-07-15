@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"os"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -25,6 +26,13 @@ func logout(ctx context.Context, request events.APIGatewayProxyRequest) (events.
     }
 	headers := make(map[string]string)
     headers["Set-Cookie"] = cookie.String()
+	// Have to do this annoying workaround because  
+	// SAM CLI https://github.com/aws/aws-sam-cli/issues/4161
+	// TODO remove this when the issue is fixed
+	if os.Getenv("ENV") == "dev" {
+		headers["Access-Control-Allow-Origin"] = "http://localhost:3000"
+		headers["Access-Control-Allow-Credentials"] = "true"
+	}
 
 	response := events.APIGatewayProxyResponse{
 		StatusCode: http.StatusOK, 

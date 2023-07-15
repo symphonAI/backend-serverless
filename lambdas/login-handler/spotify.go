@@ -55,6 +55,10 @@ func exchangeCodeForAuthTokens(code string, redirectURI string) (string, string,
 	if err != nil {
 		return "", "", err
 	}
+	if tokenResponse.AccessToken == "" {
+		return "", "", fmt.Errorf("invalid response from Spotify API: %v", string(responseData[:]))
+	}
+
 
 	return tokenResponse.RefreshToken, tokenResponse.AccessToken, nil
 }
@@ -86,12 +90,18 @@ func getUserIdentifiers(accessToken string) (string, string, error){
 
 	var data SpotifyResponse
 	err = json.Unmarshal(body, &data)
+
+	fmt.Println("Response as string:", string(body[:]))
+
 	if err != nil {
 		fmt.Println("Error parsing Spotify response:", err)
 		return "", "", err
 	}
 
 	fmt.Println("Successfully retrieved Spotify user data:", data.Email)
+	if data.Email == "" {
+		return "", "", fmt.Errorf("could not obtain email from Spotify")
+	}
 	return data.ID, data.Email, nil
 
 }

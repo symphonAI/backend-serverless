@@ -32,7 +32,10 @@ func (c *Client) createPlaylist(spotifyAccessToken string, userId string, prompt
 	endpoint := SPOTIFY_BASE_URL + "/users/" + userId + "/playlists"
 	fmt.Println("Playlist endpoint:", endpoint)
 
-	playlistName := prompt + " - " + strings.Join(options, ", ")
+	playlistName := prompt 
+	if len(options) > 0 {
+		playlistName = playlistName + " - " + strings.Join(options, ", ")
+	}
 	playlistDescription := "Created by Symphon.ai"
 	playlistPublic := true
 

@@ -32,7 +32,9 @@ You can try running the API locally using the SAM CLI, but no guarantees all the
    {
        "Parameters": {
            "OPENAI_MODEL": "<<model>>",
-           "OPENAI_API_KEY": "<<apikey>>"
+           "OPENAI_API_KEY": "<<apikey>>",
+           "SPOTIFY_CLIENT_ID": "<<spotifyclientid>",
+           "SPOTIFY_CLIENT_SECRET": "<<spotifyclientsecret>>"
        }
    }
    ```
@@ -48,19 +50,13 @@ You can try running the API locally using the SAM CLI, but no guarantees all the
 
    `env.json` is in the .gitignore, but just in case: **Please do not check in this file to version control!**
 
+   Replace `<<spotifyclientid>>` and `<<spotifyclientsecret>>` with the Spotify Developer App Client ID and App Client Secret.
+
 ### Steps to Run Locally
 
 First follow the steps above (**Setup Steps for Running Locally**), then do the following:
 
 1. Make sure Docker is running.
-
-1a. If you want to invoke the prompt lambda locally, for now you will have to:
-
-- TEMPORARILY disable the custom authoriser setup for the prompt lambda in the `backend-serverless.go` file. If you're not sure how to do this, please ask one of the devs.
-
-- TEMPORARILY hardcode a spotifyAccessToken in the correct place in the prompt lambda (so that you can invoke Spotify API from your local API without having to log in). Again if you're not sure how to do this, please ask one of the devs.
-
-**IMPORTANT NOTE: Please revert these changes after you're done running locally!**
 
 2. In the CLI, navigate to this directory and run: `make start`. This will expose the API on http://localhost:8080, so you will be able to hit API endpoints like http://localhost:8080/prompt.
 

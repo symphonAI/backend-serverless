@@ -42,7 +42,7 @@ func (m *ChatCompletionModel) ParseRecommendedTracksFromResponse(responseBody []
 		return []Track{}, err
 	}
 	var tracklist TracklistResponse
-	err = json.Unmarshal([]byte(response.Choices[0].ChatGPTFunctionMessage.ChatGPTFunctionCall.Arguments), &tracklist)
+	err = json.Unmarshal([]byte(response.Choices[0].ChatGPTFunctionMessage.Content), &tracklist)
 	if err != nil {
 		return []Track{}, err
 	}
@@ -54,16 +54,11 @@ type ChatGPTFunctionResponse struct {
 }
 
 type ChatGPTFunctionChoice struct {
-	ChatGPTFunctionMessage ChatGPTFunctionMessage `json:"message"`
+	ChatGPTFunctionMessage ChatGPTMessage `json:"message"`
 }
 
-type ChatGPTFunctionMessage struct {
-	ChatGPTFunctionCall ChatGPTFunctionCall `json:"function_call"`
-}
-
-type ChatGPTFunctionCall struct {
-	Name string `json:"name"`
-	Arguments string `json:"arguments"`
+type ChatGPTMessage struct {
+	Content string `json:"content"`
 }
 
 type TracklistResponse struct {

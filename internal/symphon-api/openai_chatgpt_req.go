@@ -46,6 +46,8 @@ func (c *Client) GetRecommendedTracks(userFields UserFields) ([]Track, error) {
 		return []Track{}, err
 	}
 
+	fmt.Println("Response from ChatGPT:", string(responseBody[:]))
+
 	tracks, err := c.openAIModel.ParseRecommendedTracksFromResponse(responseBody)
 	if err != nil {
 		fmt.Println("An error occurred while parsing the recommended tracks from the ChatGPT API response:", err)

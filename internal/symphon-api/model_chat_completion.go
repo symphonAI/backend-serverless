@@ -27,45 +27,10 @@ func (m *ChatCompletionModel) GeneratePayload(userFields UserFields) (map[string
 		"temperature": floatTemperature,
 		"messages": []map[string]interface{}{
 			{
-				"role":    "system",
-				"content": "You are a music recommendation engine.",
-			},
-			{
 				"role":    "user",
 				"content": userFields.Prompt,
 			},
 		},
-		"functions": []map[string]interface{}{
-			{
-				"name":        "get_tracklist",
-				"description": "Gets a list of tracks from a query.",
-				"parameters": map[string]interface{}{
-					"type": "object",
-					"properties": map[string]interface{}{
-						"tracklist": map[string]interface{}{
-							"type": "array",
-							"items": map[string]interface{}{
-								"type": "object",
-								"properties": map[string]interface{}{
-									"artist": map[string]interface{}{
-										"type":        "string",
-										"description": "The artist of the track.",
-									},
-									"track": map[string]interface{}{
-										"type":        "string",
-										"description": "The title of the track.",
-									},
-								},
-							},
-						},
-					},
-					"required": []string{
-						"tracklist",
-					},
-				},
-			},
-		},
-		"function_call": "auto",
 	}
 	return payload, nil
 }

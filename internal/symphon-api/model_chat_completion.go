@@ -3,6 +3,7 @@ package symphonapi
 import (
 	"encoding/json"
 	"strconv"
+	"strings"
 )
 
 type ChatCompletionModel struct {
@@ -41,12 +42,15 @@ func (m *ChatCompletionModel) ParseRecommendedTracksFromResponse(responseBody []
 	if err != nil {
 		return []Track{}, err
 	}
-	var tracklist TracklistResponse
-	err = json.Unmarshal([]byte(response.Choices[0].ChatGPTFunctionMessage.Content), &tracklist)
+	var tracks []Track
+
+	data := "[" + strings.ReplaceAll(response.Choices[0].ChatGPTMessage.Content, "\n", "") + "]"
+
+	err = json.Unmarshal([]byte(data), &tracks)
 	if err != nil {
 		return []Track{}, err
 	}
-	return tracklist.Tracks, nil
+	return tracks, nil
 }
 
 type ChatGPTFunctionResponse struct {
@@ -54,13 +58,9 @@ type ChatGPTFunctionResponse struct {
 }
 
 type ChatGPTFunctionChoice struct {
-	ChatGPTFunctionMessage ChatGPTMessage `json:"message"`
+	ChatGPTMessage ChatGPTMessage `json:"message"`
 }
 
 type ChatGPTMessage struct {
 	Content string `json:"content"`
-}
-
-type TracklistResponse struct {
-	Tracks []Track `json:"tracklist"`
 }
